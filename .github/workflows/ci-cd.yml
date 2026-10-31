@@ -128,7 +128,7 @@ jobs:
           for endpoint in "https://suleymanibis.dev" "https://suleymanibis.dev/en" "https://suleymanibis.dev/robots.txt" "https://suleymanibis.dev/sitemap.xml"; do
             ok=0
             for attempt in 1 2 3 4 5; do
-              status=$(curl -sS -o /dev/null -w "%{http_code}" --max-time 15 "$endpoint" || echo "000")
+              status=$(curl -sSL -o /dev/null -w "%{http_code}" --max-time 15 "$endpoint" || echo "000")
               if [ "$status" = "200" ]; then
                 echo "✔ $endpoint responded HTTP 200"
                 ok=1
