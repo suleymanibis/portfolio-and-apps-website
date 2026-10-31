@@ -25,7 +25,7 @@
   "about": {
     "headline": "Merhaba, ben Süleyman İbiş.",
     "subheadline": "Akdeniz Üniversitesi Bilgisayar Mühendisliği 1. sınıf öğrencisiyim. Backend sistemleri araştırmaya, öğrenmeye ve uçtan uca çalışan yazılımlar geliştirmeye odaklanıyorum.",
-    "photoUrl": "",
+    "photoUrl": "https://raw.githubusercontent.com/suleymanibis/portfolio-and-apps-website/main/public/uploads/f9f5198b-b359-4a6c-828b-61bda3507d85.png",
     "cvUrl": "",
     "currentFocus": "Şu sıralar backend sistemlerinin mimarisini araştırıp öğreniyor; Java (Spring Boot & Hibernate), PostgreSQL ve bu servislerle haberleşen Python CLI ile C# (.NET) istemci uygulamaları geliştiriyorum.",
     "storyMarkdown": "## Yazılım Yolculuğum Nasıl Başladı?\n\nBilgisayarlara ve yazılıma olan merakım ortaokul **5. sınıftaki bilgisayar dersinde** başladı. Ekranda gördüğüm programların arka planda nasıl çalıştığını kurcalama isteği, zamanla kendi araçlarımı ve projelerimi üretme tutkusuna dönüştü.\n\nAntalya'da **Akdeniz Üniversitesi**'nde **B2** seviyesinde İngilizce hazırlık eğitimimi tamamladıktan sonra şu an **Bilgisayar Mühendisliği 1. sınıf** öğrencisi olarak akademik eğitimime devam ediyorum.\n\n## Nasıl Üretiyor ve Neye Odaklanıyorum?\n\nBir yazılımı yalnızca tek bir katmandan ibaret görmek yerine, arka uçtan istemciye kadar **uçtan uca nasıl haberleştiğini** deneyimleyerek öğrenmeyi seviyorum. Örneğin Java ile geliştirdiğim bir e-ticaret REST API servisini hem **Python** tabanlı bir komut satırı (CLI) istemcisiyle hem de **C# (.NET WinForms)** ile yazdığım masaüstü arayüzüyle entegre ederek çok katmanlı sistem pratikleri yapıyorum.\n\nFarklı disiplinleri tanımak adına zaman zaman *Unity* ve *Godot* gibi oyun motorlarıyla da kişisel denemeler yaptım; ancak asıl enerjimi ve mühendislik odağımı **backend sistemleri, API tasarımı ve veritabanı mimarisi** üzerine kurdum.",
@@ -79,27 +79,27 @@
       }
     ],
     "en": {
-      "headline": "Hi there, I'm Süleyman İbiş.",
-      "subheadline": "First-year Computer Engineering student at Akdeniz University, focused on researching, learning, and building reliable backend systems and end-to-end software.",
-      "currentFocus": "Currently researching and learning backend system architectures while building practical services with Java (Spring Boot & Hibernate), PostgreSQL, and multi-client tools in Python CLI and C# (.NET).",
-      "storyMarkdown": "## How My Software Journey Started\n\nMy curiosity for computers and software sparked back in **5th-grade computer class**. Wanting to understand how the programs on my screen actually worked behind the scenes gradually evolved into a passion for building software of my own.\n\nAfter completing my **B2-level** English preparatory year at **Akdeniz University** in Antalya, I am currently pursuing my **first year in Computer Engineering**.\n\n## How I Build & What I Focus On\n\nRather than viewing software through a single layer, I enjoy learning how systems communicate **end to end**—from database and API design all the way to client applications. For example, I built a Java e-commerce REST API and paired it with both a **Python CLI** client and a **C# (.NET WinForms)** desktop interface to practice multi-client architecture firsthand.\n\nOut of curiosity for different domains, I have also experimented locally with game engines like *Unity* and *Godot*, while dedicating my main engineering focus to **backend systems, RESTful APIs, and database architecture**.",
+      "headline": "Hello, I am Süleyman İbiş.",
+      "subheadline": "I am a first year student at Akdeniz University Computer Engineering. I focus on researching and learning backend systems and developing end-to-end working software.",
+      "storyMarkdown": "## How Did My Software Journey Begin?\n\nMy interest in computers and software is in secondary school **5. It started in the classroom computer class**. The desire to tinker with how the programs I saw on the screen worked in the background turned into a passion for producing my own tools and projects over time.\n\nAfter completing my English preparatory education at **B2** level at **Akdeniz University** in Antalya, I am currently continuing my academic education as a **Computer Engineering first year** student.\n\n## How Do I Create and What Do I Focus on?\n\nInstead of seeing a software as just a single layer, I like to learn by experiencing how it communicates **end-to-end** from the backend to the client. For example, I implement multi-layered systems by integrating an e-commerce REST API service I developed in Java with both a **Python**-based command line (CLI) client and a desktop interface I wrote in **C# (.NET WinForms)**.\n\nIn order to get to know different disciplines, I also made personal experiments with game engines such as *Unity* and *Godot* from time to time; However, I focused my main energy and engineering focus on **backend systems, API design and database architecture**.",
+      "currentFocus": "He is currently researching and learning the architecture of backend systems; I develop C# (.NET) client applications with Java (Spring Boot & Hibernate), PostgreSQL and Python CLI that communicate with these services.",
       "education": [
         {
-          "period": "2026 — Present",
+          "period": "2026—Present",
           "institution": "Akdeniz University",
-          "title": "B.Sc. in Computer Engineering (Freshman / Year 1)",
-          "description": "Pursuing undergraduate studies in computer science fundamentals, algorithms, and software engineering in Antalya, Türkiye."
+          "title": "Computer Engineering Undergraduate (1st Year)",
+          "description": "I am continuing my undergraduate education on computer science fundamentals, algorithms and software engineering in Antalya."
         },
         {
           "period": "2025 — 2026",
           "institution": "Akdeniz University School of Foreign Languages",
-          "title": "English Preparatory Program (B2 Level)",
-          "description": "Completed intensive B2-level English preparatory education, enabling fluent engagement with technical documentation and engineering literature."
+          "title": "English Preparatory Education (B2 Level)",
+          "description": "I have completed B2 level English preparatory training with the competence to directly follow global technical documentation and software resources."
         }
       ],
       "skillGroups": [
         {
-          "category": "Languages & Backend Stack",
+          "category": "Languages & Backend Technologies",
           "items": [
             "Java",
             "Spring Boot",
@@ -112,7 +112,7 @@
           ]
         },
         {
-          "category": "IDEs & Development Environments",
+          "category": "IDE & Development Environments",
           "items": [
             "IntelliJ IDEA",
             "VS Code",
@@ -123,16 +123,17 @@
           ]
         },
         {
-          "category": "Deployment & Explored Tools",
+          "category": "Cloud, Distribution & What I Discovered",
           "items": [
             "Vercel",
-            "Render",
+            "rendering",
             "CLI & Desktop Clients",
-            "Unity & Godot (Personal Exploration)"
+            "Unity & Godot (Personal Essays)"
           ]
         }
       ]
-    }
+    },
+    "updatedAt": "2026-10-31T17:02:09.223Z"
   },
   "apps": [],
   "articles": []
