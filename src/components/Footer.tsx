@@ -61,6 +61,7 @@ export function Footer({ profile }: { profile: SiteProfile }) {
           <span className="h-4 w-px bg-slate-200 dark:bg-zinc-800 mx-1" />
           <Link
             href="/admin"
+            prefetch={false}
             className="text-xs text-slate-500 dark:text-zinc-500 hover:text-indigo-500 transition-colors"
           >
             Yönetim

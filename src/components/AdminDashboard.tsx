@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -79,6 +79,10 @@ export function AdminDashboard({
   const [authError, setAuthError] = useState("");
   const [authLoading, setAuthLoading] = useState(false);
 
+  useEffect(() => {
+    setAuthenticated(initialAuthenticated);
+  }, [initialAuthenticated]);
+
   const [activeTab, setActiveTab] = useState<AdminTab>("overview");
   const [apps, setApps] = useState<AppItem[]>(initialApps);
   const [articles, setArticles] = useState<ArticleItem[]>(initialArticles);
@@ -137,9 +141,19 @@ export function AdminDashboard({
   };
 
   const handleLogout = async () => {
-    await fetch("/api/auth", { method: "DELETE" });
-    setAuthenticated(false);
-    router.refresh();
+    try {
+      await fetch("/api/auth", {
+        method: "DELETE",
+        cache: "no-store",
+        credentials: "same-origin",
+      });
+    } finally {
+      setAuthenticated(false);
+      setEditingApp(false);
+      setEditingArticle(false);
+      // Full navigation clears Next.js client Router Cache completely
+      window.location.replace("/admin");
+    }
   };
 
   // --- Image Upload Helper ---

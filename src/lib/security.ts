@@ -122,8 +122,9 @@ export function checkMutationRateLimit(request: Request): NextResponse | null {
  */
 export function verifySameOrigin(request: Request): NextResponse | null {
   const origin = request.headers.get("origin");
-  const host =
+  const rawHost =
     request.headers.get("x-forwarded-host") || request.headers.get("host");
+  const host = rawHost ? rawHost.split(",")[0].trim() : "";
 
   if (!host) {
     return NextResponse.json(

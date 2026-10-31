@@ -88,6 +88,17 @@ export async function DELETE(request: Request) {
   if (csrfErr) return csrfErr;
 
   const cookieStore = await cookies();
-  cookieStore.delete(AUTH_COOKIE_NAME);
-  return NextResponse.json({ success: true });
+  // __Host- prefixed cookies strictly require Secure + Path=/ even when expiring/deleting
+  cookieStore.set(AUTH_COOKIE_NAME, "", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    path: "/",
+    maxAge: 0,
+    expires: new Date(0),
+  });
+
+  const response = NextResponse.json({ success: true });
+  response.headers.set("Cache-Control", "no-store, max-age=0");
+  return response;
 }

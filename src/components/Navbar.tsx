@@ -60,6 +60,7 @@ export function Navbar({ siteName }: NavbarProps) {
           <ThemeToggle />
           <Link
             href="/admin"
+            prefetch={false}
             className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold border transition-all ${
               pathname.startsWith("/admin")
                 ? "border-indigo-500 bg-indigo-600 text-white"
@@ -109,6 +110,7 @@ export function Navbar({ siteName }: NavbarProps) {
           })}
           <Link
             href="/admin"
+            prefetch={false}
             onClick={() => setMobileOpen(false)}
             className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-semibold text-indigo-600 dark:text-indigo-400"
           >
