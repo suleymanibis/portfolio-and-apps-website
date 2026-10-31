@@ -30,10 +30,27 @@ export function Navbar({ siteName }: NavbarProps) {
           href="/"
           className="flex items-center gap-2.5 font-bold text-lg tracking-tight text-slate-900 dark:text-white group"
         >
-          <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 text-white shadow-sm group-hover:scale-105 transition-transform">
-            <Code2 className="w-4 h-4" />
-          </span>
-          <span>{siteName}</span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo-mark.png"
+            alt={siteName}
+            width={36}
+            height={36}
+            className="w-9 h-9 rounded-xl shadow-sm ring-1 ring-indigo-500/25 group-hover:scale-105 transition-transform"
+          />
+          {siteName.toLowerCase() === "suleymanibis.dev" ? (
+            <span className="flex items-baseline">
+              <span>suleyman</span>
+              <span className="bg-gradient-to-r from-indigo-500 via-violet-500 to-sky-400 bg-clip-text text-transparent">
+                ibis
+              </span>
+              <span className="text-xs font-mono font-semibold text-indigo-500 dark:text-indigo-400 ml-0.5 -translate-y-1.5">
+                .dev
+              </span>
+            </span>
+          ) : (
+            <span>{siteName}</span>
+          )}
         </Link>
 
         {/* Desktop Nav */}

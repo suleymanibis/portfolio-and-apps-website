@@ -6,13 +6,23 @@ export function Footer({ profile }: { profile: SiteProfile }) {
   return (
     <footer className="border-t border-slate-200 dark:border-zinc-800/80 bg-white/60 dark:bg-zinc-950/60 mt-20">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="text-center sm:text-left">
-          <p className="font-semibold text-slate-900 dark:text-zinc-100">
-            {profile.siteName}
-          </p>
-          <p className="text-xs text-slate-500 dark:text-zinc-500 mt-1">
-            © {new Date().getFullYear()} {profile.ownerName}. Tüm hakları saklıdır.
-          </p>
+        <div className="flex items-center gap-3 text-center sm:text-left">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo-mark.png"
+            alt={profile.siteName}
+            width={32}
+            height={32}
+            className="w-8 h-8 rounded-lg ring-1 ring-indigo-500/20 hidden sm:block"
+          />
+          <div>
+            <p className="font-semibold text-slate-900 dark:text-zinc-100">
+              {profile.siteName}
+            </p>
+            <p className="text-xs text-slate-500 dark:text-zinc-500 mt-0.5">
+              © {new Date().getFullYear()} {profile.ownerName}. Tüm hakları saklıdır.
+            </p>
+          </div>
         </div>
 
         <div className="flex items-center gap-3">

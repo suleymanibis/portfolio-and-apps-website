@@ -18,11 +18,42 @@ const jetbrainsMono = JetBrains_Mono({
 export async function generateMetadata(): Promise<Metadata> {
   const profile = await getProfile();
   return {
+    metadataBase: new URL("https://suleymanibis.dev"),
     title: {
       default: `${profile.siteName} — Uygulamalar & Makaleler`,
       template: `%s | ${profile.siteName}`,
     },
     description: profile.heroGreeting,
+    icons: {
+      icon: [
+        { url: "/logo-mark.png?v=2", type: "image/png", sizes: "256x256" },
+        { url: "/favicon.ico?v=2", sizes: "48x48" },
+      ],
+      shortcut: "/favicon.ico?v=2",
+      apple: [{ url: "/logo-mark.png?v=2", sizes: "180x180", type: "image/png" }],
+    },
+    openGraph: {
+      title: `${profile.siteName} — Uygulamalar & Makaleler`,
+      description: profile.heroGreeting,
+      url: "https://suleymanibis.dev",
+      siteName: profile.siteName,
+      images: [
+        {
+          url: "/logo.jpg",
+          width: 800,
+          height: 800,
+          alt: profile.siteName,
+        },
+      ],
+      locale: "tr_TR",
+      type: "website",
+    },
+    twitter: {
+      card: "summary",
+      title: `${profile.siteName} — Uygulamalar & Makaleler`,
+      description: profile.heroGreeting,
+      images: ["/logo.jpg"],
+    },
   };
 }
 
