@@ -1,6 +1,12 @@
 import fs from "fs/promises";
 import path from "path";
-import { AppItem, ArticleItem, DatabaseSchema, SiteProfile } from "@/types";
+import {
+  AboutPageData,
+  AppItem,
+  ArticleItem,
+  DatabaseSchema,
+  SiteProfile,
+} from "@/types";
 import {
   sanitizeHttpUrl,
   sanitizeImageUrl,
@@ -10,15 +16,157 @@ import {
 const DATA_DIR = path.join(process.cwd(), "data");
 const DB_FILE = path.join(DATA_DIR, "db.json");
 
+export const defaultAboutData: AboutPageData = {
+  headline: "Merhaba, ben Süleyman İbiş.",
+  subheadline:
+    "Akdeniz Üniversitesi Bilgisayar Mühendisliği 1. sınıf öğrencisiyim. Backend sistemleri araştırmaya, öğrenmeye ve uçtan uca çalışan yazılımlar geliştirmeye odaklanıyorum.",
+  photoUrl: "",
+  cvUrl: "",
+  currentFocus:
+    "Şu sıralar backend sistemlerinin mimarisini araştırıp öğreniyor; Java (Spring Boot & Hibernate), PostgreSQL ve bu servislerle haberleşen Python CLI ile C# (.NET) istemci uygulamaları geliştiriyorum.",
+  storyMarkdown: `## Yazılım Yolculuğum Nasıl Başladı?
+
+Bilgisayarlara ve yazılıma olan merakım ortaokul **5. sınıftaki bilgisayar dersinde** başladı. Ekranda gördüğüm programların arka planda nasıl çalıştığını kurcalama isteği, zamanla kendi araçlarımı ve projelerimi üretme tutkusuna dönüştü.
+
+Antalya'da **Akdeniz Üniversitesi**'nde **B2** seviyesinde İngilizce hazırlık eğitimimi tamamladıktan sonra şu an **Bilgisayar Mühendisliği 1. sınıf** öğrencisi olarak akademik eğitimime devam ediyorum.
+
+## Nasıl Üretiyor ve Neye Odaklanıyorum?
+
+Bir yazılımı yalnızca tek bir katmandan ibaret görmek yerine, arka uçtan istemciye kadar **uçtan uca nasıl haberleştiğini** deneyimleyerek öğrenmeyi seviyorum. Örneğin Java ile geliştirdiğim bir e-ticaret REST API servisini hem **Python** tabanlı bir komut satırı (CLI) istemcisiyle hem de **C# (.NET WinForms)** ile yazdığım masaüstü arayüzüyle entegre ederek çok katmanlı sistem pratikleri yapıyorum.
+
+Farklı disiplinleri tanımak adına zaman zaman *Unity* ve *Godot* gibi oyun motorlarıyla da kişisel denemeler yaptım; ancak asıl enerjimi ve mühendislik odağımı **backend sistemleri, API tasarımı ve veritabanı mimarisi** üzerine kurdum.`,
+  education: [
+    {
+      period: "2026 — Günümüz",
+      institution: "Akdeniz Üniversitesi",
+      title: "Bilgisayar Mühendisliği Lisans (1. Sınıf)",
+      description:
+        "Antalya'da bilgisayar bilimleri temelleri, algoritmalar ve yazılım mühendisliği üzerine lisans eğitimime devam ediyorum.",
+    },
+    {
+      period: "2025 — 2026",
+      institution: "Akdeniz Üniversitesi Yabancı Diller Yüksekokulu",
+      title: "İngilizce Hazırlık Eğitimi (B2 Seviyesi)",
+      description:
+        "Global teknik dokümantasyonları ve yazılım kaynaklarını doğrudan takip edebilecek yetkinlikte B2 seviye İngilizce hazırlık eğitimini tamamladım.",
+    },
+  ],
+  skillGroups: [
+    {
+      category: "Diller & Backend Teknolojileri",
+      items: [
+        "Java",
+        "Spring Boot",
+        "Hibernate",
+        "Python",
+        "C#",
+        ".NET (WinForms)",
+        "RESTful API",
+        "PostgreSQL",
+      ],
+    },
+    {
+      category: "IDE & Geliştirme Ortamları",
+      items: [
+        "IntelliJ IDEA",
+        "VS Code",
+        "Visual Studio",
+        "Eclipse",
+        "Atom",
+        "Git & GitHub",
+      ],
+    },
+    {
+      category: "Bulut, Dağıtım & Keşfettiklerim",
+      items: [
+        "Vercel",
+        "Render",
+        "CLI & Masaüstü İstemciler",
+        "Unity & Godot (Kişisel Denemeler)",
+      ],
+    },
+  ],
+  en: {
+    headline: "Hi there, I'm Süleyman İbiş.",
+    subheadline:
+      "First-year Computer Engineering student at Akdeniz University, focused on researching, learning, and building reliable backend systems and end-to-end software.",
+    currentFocus:
+      "Currently researching and learning backend system architectures while building practical services with Java (Spring Boot & Hibernate), PostgreSQL, and multi-client tools in Python CLI and C# (.NET).",
+    storyMarkdown: `## How My Software Journey Started
+
+My curiosity for computers and software sparked back in **5th-grade computer class**. Wanting to understand how the programs on my screen actually worked behind the scenes gradually evolved into a passion for building software of my own.
+
+After completing my **B2-level** English preparatory year at **Akdeniz University** in Antalya, I am currently pursuing my **first year in Computer Engineering**.
+
+## How I Build & What I Focus On
+
+Rather than viewing software through a single layer, I enjoy learning how systems communicate **end to end**—from database and API design all the way to client applications. For example, I built a Java e-commerce REST API and paired it with both a **Python CLI** client and a **C# (.NET WinForms)** desktop interface to practice multi-client architecture firsthand.
+
+Out of curiosity for different domains, I have also experimented locally with game engines like *Unity* and *Godot*, while dedicating my main engineering focus to **backend systems, RESTful APIs, and database architecture**.`,
+    education: [
+      {
+        period: "2026 — Present",
+        institution: "Akdeniz University",
+        title: "B.Sc. in Computer Engineering (Freshman / Year 1)",
+        description:
+          "Pursuing undergraduate studies in computer science fundamentals, algorithms, and software engineering in Antalya, Türkiye.",
+      },
+      {
+        period: "2025 — 2026",
+        institution: "Akdeniz University School of Foreign Languages",
+        title: "English Preparatory Program (B2 Level)",
+        description:
+          "Completed intensive B2-level English preparatory education, enabling fluent engagement with technical documentation and engineering literature.",
+      },
+    ],
+    skillGroups: [
+      {
+        category: "Languages & Backend Stack",
+        items: [
+          "Java",
+          "Spring Boot",
+          "Hibernate",
+          "Python",
+          "C#",
+          ".NET (WinForms)",
+          "RESTful API",
+          "PostgreSQL",
+        ],
+      },
+      {
+        category: "IDEs & Development Environments",
+        items: [
+          "IntelliJ IDEA",
+          "VS Code",
+          "Visual Studio",
+          "Eclipse",
+          "Atom",
+          "Git & GitHub",
+        ],
+      },
+      {
+        category: "Deployment & Explored Tools",
+        items: [
+          "Vercel",
+          "Render",
+          "CLI & Desktop Clients",
+          "Unity & Godot (Personal Exploration)",
+        ],
+      },
+    ],
+  },
+};
+
 const initialSeedData: DatabaseSchema = {
   profile: {
     siteName: "suleymanibis.dev",
     ownerName: "Süleyman İbiş",
     roleTitle: "Yazılım Geliştirici & Bilgisayar Mühendisliği Öğrencisi",
-    heroGreeting: "Geliştirdiğim uygulamaları ve teknik makalelerimi paylaştığım dijital çalışma alanım.",
+    heroGreeting:
+      "Geliştirdiğim uygulamaları ve teknik makalelerimi paylaştığım dijital çalışma alanım.",
     bio: "Backend sistemleri, modern web uygulamaları ve geliştirici araçları üzerine projeler üretiyorum. Burada yayına aldığım yazılımları inceleyebilir ve yazılım mühendisliği süreçlerine dair yazdığım makaleleri okuyabilirsiniz.",
-    location: "Türkiye",
-    availableForWork: true,
+    location: "Antalya, Türkiye",
+    availableForWork: false,
     githubUrl: "https://github.com/suleymanibis",
     twitterUrl: "",
     linkedinUrl: "",
@@ -27,94 +175,14 @@ const initialSeedData: DatabaseSchema = {
     discordUrl: "",
     email: "",
   },
-  apps: [
-    {
-      id: "app-1",
-      title: "FocusFlow Pomodoro & Görev Yöneticisi",
-      slug: "focusflow-pomodoro-gorev-yoneticisi",
-      tagline: "Derin çalışma seanslarınızı takip eden minimalist masaüstü ve web üretkenlik aracı.",
-      description: `## Proje Hakkında
-
-**FocusFlow**, dikkat dağıtıcı unsurları en aza indirerek günlük görevlerinizi Pomodoro tekniğiyle birleştiren modern bir üretkenlik uygulamasıdır.
-
-### Öne Çıkan Özellikler
-- **Akıllı Zamanlayıcı:** Özelleştirilebilir çalışma ve mola periyotları.
-- **Klavye Kısayolları:** Fareye dokunmadan görev ekleme ve zamanlayıcı başlatma.
-- **Haftalık İstatistikler:** Hangi projeye ne kadar vakit ayırdığınızı gösteren grafikler.
-- **Çevrimdışı Çalışma:** Yerel depolama desteği ile internet olmadan da kesintisiz kullanım.`,
-      category: "Üretkenlik",
-      techStack: ["Next.js", "TypeScript", "Tailwind CSS", "IndexedDB"],
-      demoUrl: "https://suleymanibis.dev",
-      repoUrl: "https://github.com/suleymanibis",
-      version: "v1.4.0",
-      status: "live",
-      featured: true,
-      createdAt: "2026-09-15T10:00:00.000Z",
-      updatedAt: "2026-10-20T14:30:00.000Z",
-    },
-    {
-      id: "app-2",
-      title: "Commerce Cart Backend & İstemci Araçları",
-      slug: "commerce-cart-backend-ve-istemci-araclari",
-      tagline: "E-ticaret sepet ve sipariş akışlarını simüle eden REST API ve çoklu istemci mimarisi.",
-      description: `## Mimari Genel Bakış
-
-Modern e-ticaret sistemlerindeki sepet, stok ve sipariş doğrulama süreçlerini simüle eden uçtan uca bir yazılım ailesidir.
-
-### Bileşenler
-1. **REST API Sunucusu:** Katmanlı mimari ve veritabanı bütünlüğü odaklı arka uç servisi.
-2. **Masaüstü Arayüzü (.NET WinForms):** API uç noktalarıyla etkileşim kuran görsel istemci.
-3. **Python CLI İstemcisi:** Terminal üzerinden hızlı test ve otomasyon aracı.`,
-      category: "Backend & Sistem",
-      techStack: ["Java", "Spring Boot", "C# .NET", "Python", "PostgreSQL"],
-      repoUrl: "https://github.com/suleymanibis",
-      version: "v2.0.0",
-      status: "open-source",
-      featured: true,
-      createdAt: "2026-08-10T09:00:00.000Z",
-      updatedAt: "2026-10-05T11:15:00.000Z",
-    },
-  ],
-  articles: [
-    {
-      id: "art-1",
-      title: "Vibe Coding ile Fikirden Ürüne: Hızlı Prototipleme Rehberi",
-      slug: "vibe-coding-ile-fikirden-urune-hizli-prototipleme-rehberi",
-      excerpt: "Yapay zeka destekli geliştirme araçlarıyla yazılım üretirken kod kalitesini, güvenliği ve mimari bütünlüğü korumanın pratik yolları.",
-      content: `Yazılım geliştirme dünyası son yıllarda büyük bir dönüşüm geçiriyor. Artık bir fikri çalışan bir prototipe dönüştürmek haftalar değil, saatler sürüyor. Ancak hız kazandıkça **mimari disiplin** ve **güvenlik** her zamankinden daha önemli hale geliyor.
-
-## 1. Önce Veri Modelini Netleştirin
-
-Kod yazmaya başlamadan önce uygulamanızın temel veri tiplerini belirlemek, ileride yaşanacak karmaşayı önler:
-
-\`\`\`typescript
-interface Project {
-  id: string;
-  name: string;
-  status: "draft" | "published";
-  tags: string[];
-}
-\`\`\`
-
-## 2. Güvenliği Sonraya Bırakmayın
-
-Ürünü canlıya almadan önce kimlik doğrulama, hız sınırlandırma (rate limiting), girdi doğrulama ve HTTP güvenlik başlıklarını mutlaka devreye alın.
-
-> İyi bir ürün, karmaşık özelliklerin yığını değil; tek bir problemi güvenli ve pürüzsüzce çözen sade bir sistemdir.`,
-      category: "Yazılım Geliştirme",
-      tags: ["Vibe Coding", "Mimari", "Güvenlik", "TypeScript"],
-      published: true,
-      featured: true,
-      readingTimeMinutes: 3,
-      createdAt: "2026-10-25T12:00:00.000Z",
-      updatedAt: "2026-10-25T12:00:00.000Z",
-    },
-  ],
+  about: defaultAboutData,
+  apps: [],
+  articles: [],
 };
 
 function getGitHubStorageConfig() {
   const token = process.env.GITHUB_TOKEN?.trim();
-  const repo = process.env.GITHUB_REPO?.trim(); // e.g. "suleymanibis/portfolio-hub"
+  const repo = process.env.GITHUB_REPO?.trim();
   const branch = process.env.GITHUB_BRANCH?.trim() || "main";
   if (token && repo && /^[\w.-]+\/[\w.-]+$/.test(repo)) {
     return { token, repo, branch };
@@ -156,9 +224,10 @@ async function writeDbToGitHub(
 ): Promise<void> {
   const existing = await readDbFromGitHub(cfg);
   const url = `https://api.github.com/repos/${cfg.repo}/contents/data/db.json`;
-  const contentB64 = Buffer.from(JSON.stringify(data, null, 2), "utf-8").toString(
-    "base64"
-  );
+  const contentB64 = Buffer.from(
+    JSON.stringify(data, null, 2),
+    "utf-8"
+  ).toString("base64");
 
   const res = await fetch(url, {
     method: "PUT",
@@ -182,6 +251,7 @@ async function writeDbToGitHub(
 }
 
 function normalizeDbOnRead(rawDb: DatabaseSchema): DatabaseSchema {
+  const rawAbout = rawDb.about || structuredClone(defaultAboutData);
   return {
     profile: {
       ...rawDb.profile,
@@ -195,6 +265,15 @@ function normalizeDbOnRead(rawDb: DatabaseSchema): DatabaseSchema {
       ),
       micupUrl: sanitizeSocialValue(rawDb.profile?.micupUrl),
       discordUrl: sanitizeSocialValue(rawDb.profile?.discordUrl),
+    },
+    about: {
+      ...rawAbout,
+      photoUrl: sanitizeImageUrl(rawAbout.photoUrl),
+      cvUrl: sanitizeHttpUrl(rawAbout.cvUrl),
+      education: Array.isArray(rawAbout.education) ? rawAbout.education : [],
+      skillGroups: Array.isArray(rawAbout.skillGroups)
+        ? rawAbout.skillGroups
+        : [],
     },
     apps: Array.isArray(rawDb.apps)
       ? rawDb.apps.map((app) => ({
@@ -272,6 +351,23 @@ export async function updateProfile(
   db.profile = { ...db.profile, ...profile };
   await saveDb(db);
   return db.profile;
+}
+
+export async function getAbout(): Promise<AboutPageData> {
+  const db = await ensureDb();
+  return db.about || structuredClone(defaultAboutData);
+}
+
+export async function updateAbout(
+  about: AboutPageData
+): Promise<AboutPageData> {
+  const db = await ensureDb();
+  db.about = {
+    ...about,
+    updatedAt: new Date().toISOString(),
+  };
+  await saveDb(db);
+  return db.about;
 }
 
 export async function getApps(): Promise<AppItem[]> {

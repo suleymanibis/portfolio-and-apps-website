@@ -10,6 +10,7 @@ import {
   Layers,
   LayoutDashboard,
   Menu,
+  User,
   X,
 } from "lucide-react";
 import type { Locale } from "@/types";
@@ -32,6 +33,7 @@ export function Navbar({ siteName, locale = "tr" }: NavbarProps) {
     { href: "/apps", label: t.apps, icon: Layers },
     { href: "/repos", label: t.repos, icon: FolderGit2 },
     { href: "/articles", label: t.articles, icon: FileText },
+    { href: "/about", label: t.about, icon: User },
   ];
 
   const isActive = (href: string) =>

@@ -80,6 +80,40 @@ export interface SiteProfile {
   en?: ProfileTranslation;
 }
 
+export interface AboutEducationItem {
+  period: string;
+  institution: string;
+  title: string;
+  description: string;
+}
+
+export interface AboutSkillGroup {
+  category: string;
+  items: string[];
+}
+
+export interface AboutTranslation {
+  headline: string;
+  subheadline: string;
+  storyMarkdown: string;
+  currentFocus: string;
+  education: AboutEducationItem[];
+  skillGroups: AboutSkillGroup[];
+}
+
+export interface AboutPageData {
+  headline: string;
+  subheadline: string;
+  photoUrl?: string;
+  cvUrl?: string;
+  storyMarkdown: string;
+  currentFocus: string;
+  education: AboutEducationItem[];
+  skillGroups: AboutSkillGroup[];
+  updatedAt?: string;
+  en?: AboutTranslation;
+}
+
 export interface PinnedRepoItem {
   name: string;
   owner: string;
@@ -96,6 +130,7 @@ export interface PinnedRepoItem {
 
 export interface DatabaseSchema {
   profile: SiteProfile;
+  about?: AboutPageData;
   apps: AppItem[];
   articles: ArticleItem[];
 }

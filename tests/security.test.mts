@@ -277,3 +277,29 @@ test("8. Bilingual i18n dictionary & Markdown translator preserve code blocks an
     globalThis.fetch = originalFetch;
   }
 });
+
+test("9. About page localization returns Turkish or English content cleanly", async () => {
+  const { localizeAbout } = await import("../src/lib/translator.ts");
+  const sampleAbout = {
+    headline: "Merhaba, ben Süleyman İbiş.",
+    subheadline: "Bilgisayar Mühendisliği öğrencisi",
+    currentFocus: "Backend sistemleri",
+    storyMarkdown: "## Yolculuğum",
+    education: [],
+    skillGroups: [{ category: "IDE", items: ["IntelliJ IDEA", "VS Code"] }],
+    en: {
+      headline: "Hi there, I'm Süleyman İbiş.",
+      subheadline: "Computer Engineering student",
+      currentFocus: "Backend systems",
+      storyMarkdown: "## My Journey",
+      education: [],
+      skillGroups: [{ category: "IDEs", items: ["IntelliJ IDEA", "VS Code"] }],
+    },
+  };
+
+  const trOut = await localizeAbout(sampleAbout, "tr");
+  const enOut = await localizeAbout(sampleAbout, "en");
+  assert.equal(trOut.headline, "Merhaba, ben Süleyman İbiş.");
+  assert.equal(enOut.headline, "Hi there, I'm Süleyman İbiş.");
+  assert.equal(enOut.skillGroups[0].category, "IDEs");
+});

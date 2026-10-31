@@ -21,6 +21,7 @@ export const dictionaries = {
       apps: "Uygulamalar",
       repos: "GitHub Repoları",
       articles: "Makaleler",
+      about: "Hakkımda",
       admin: "Yönetim",
       adminPanel: "Yönetim Paneli",
       toggleMenu: "Menüyü aç/kapat",
@@ -105,6 +106,22 @@ export const dictionaries = {
       copyCode: "Kopyala",
       copiedCode: "Kopyalandı",
     },
+    about: {
+      metaTitle: "Hakkımda",
+      metaDesc:
+        "Süleyman İbiş hakkında bilgiler, eğitim geçmişi, yazılım yolculuğu ve kullandığı teknolojiler.",
+      badge: "Hakkımda • Geliştirici Profili",
+      downloadCv: "CV Görüntüle / İndir",
+      focusTitle: "Şu Sıralar Neye Odaklanıyorum?",
+      storyTitle: "Hikayem & Mühendislik Yaklaşımım",
+      educationTitle: "Eğitim & Akademik Süreç",
+      skillsTitle: "Teknolojiler, Diller & Geliştirme Ortamları",
+      connectTitle: "İletişim & Bağlantılar",
+      connectDesc:
+        "Projelerim, backend mimarileri veya yazılım geliştirme üzerine sohbet etmek için aşağıdaki kanallardan bana ulaşabilirsiniz.",
+      exploreRepos: "GitHub Repolarımı İncele",
+      exploreApps: "Uygulamalarıma Göz At",
+    },
     footer: {
       rights: "Tüm hakları saklıdır.",
       admin: "Yönetim",
@@ -123,6 +140,7 @@ export const dictionaries = {
       apps: "Apps",
       repos: "GitHub Repos",
       articles: "Articles",
+      about: "About",
       admin: "Admin",
       adminPanel: "Admin Panel",
       toggleMenu: "Toggle menu",
@@ -207,6 +225,22 @@ export const dictionaries = {
       copiedLink: "Link Copied",
       copyCode: "Copy",
       copiedCode: "Copied",
+    },
+    about: {
+      metaTitle: "About Me",
+      metaDesc:
+        "Learn more about Süleyman İbiş, his Computer Engineering journey, backend focus, and technical toolkit.",
+      badge: "About Me • Developer Profile",
+      downloadCv: "View / Download Resume",
+      focusTitle: "What I Am Currently Focusing On",
+      storyTitle: "My Story & Engineering Approach",
+      educationTitle: "Education & Academic Background",
+      skillsTitle: "Technologies, Languages & Development Tools",
+      connectTitle: "Get in Touch",
+      connectDesc:
+        "Feel free to reach out through any of the channels below to talk about backend engineering, software projects, or ideas.",
+      exploreRepos: "Browse GitHub Repos",
+      exploreApps: "Explore My Apps",
     },
     footer: {
       rights: "All rights reserved.",

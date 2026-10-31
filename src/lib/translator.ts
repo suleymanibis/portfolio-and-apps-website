@@ -1,4 +1,8 @@
 import type {
+  AboutEducationItem,
+  AboutPageData,
+  AboutSkillGroup,
+  AboutTranslation,
   AppItem,
   AppTranslation,
   ArticleItem,
@@ -13,6 +17,7 @@ import type {
 const runtimeAppCache = new Map<string, AppTranslation>();
 const runtimeArticleCache = new Map<string, ArticleTranslation>();
 const runtimeProfileCache = new Map<string, ProfileTranslation>();
+const runtimeAboutCache = new Map<string, AboutTranslation>();
 const runtimeRepoDescCache = new Map<string, string>();
 
 function boundCache<T>(map: Map<string, T>, max = 200) {
@@ -33,7 +38,6 @@ export async function translateTextTrToEn(
   const trimmed = text.trim();
   if (!trimmed) return text;
 
-  // Chunk into <= 3500 chars on newline boundaries for safety on long texts
   const lines = text.split("\n");
   const chunks: string[] = [];
   let current = "";
@@ -104,14 +108,12 @@ export async function translateTextTrToEn(
 export async function translateMarkdownTrToEn(markdown: string): Promise<string> {
   if (!markdown || !markdown.trim()) return markdown;
 
-  // Split by fenced code blocks: odd indices are ```...``` blocks
   const segments = markdown.split(/(```[\s\S]*?```)/g);
   const outputSegments: string[] = [];
 
   for (let idx = 0; idx < segments.length; idx++) {
     const seg = segments[idx];
     if (idx % 2 === 1) {
-      // Fenced code block -> keep verbatim
       outputSegments.push(seg);
       continue;
     }
@@ -129,7 +131,6 @@ export async function translateMarkdownTrToEn(markdown: string): Promise<string>
     const maskedBodies: string[] = [];
 
     for (const line of lines) {
-      // Horizontal rules or empty lines stay empty/untouched
       if (!line.trim() || /^\s*([-*_])\1{2,}\s*$/.test(line)) {
         prefixes.push(line);
         maskedBodies.push("");
@@ -142,13 +143,11 @@ export async function translateMarkdownTrToEn(markdown: string): Promise<string>
       const prefix = prefixMatch ? prefixMatch[1] : "";
       let rest = prefixMatch ? prefixMatch[2] : line;
 
-      // Mask inline code `...`
       rest = rest.replace(/`[^`]+`/g, (match) => {
         const i = inlineCodes.push(match) - 1;
         return `§c${i}§`;
       });
 
-      // Mask link & image URLs ](url)
       rest = rest.replace(/\]\(([^)]+)\)/g, (_full, url: string) => {
         const i = linkUrls.push(url) - 1;
         return `](§u${i}§)`;
@@ -165,12 +164,11 @@ export async function translateMarkdownTrToEn(markdown: string): Promise<string>
       const prefix = prefixes[lineIdx];
       const maskedOriginal = maskedBodies[lineIdx];
       if (!maskedOriginal) {
-        return prefix; // empty line or horizontal rule
+        return prefix;
       }
 
       let tLine = translatedLines[lineIdx] ?? maskedOriginal;
 
-      // Restore URLs and inline code spans (tolerant to whitespace/case variations)
       tLine = tLine.replace(/§\s*u(\d+)\s*§/gi, (_m, n) => {
         return linkUrls[Number(n)] ?? _m;
       });
@@ -264,7 +262,87 @@ export async function buildProfileEnTranslation(input: {
   };
 }
 
-// --- Display Localization Helpers (instant if `.en` exists, lazy-cached fallback otherwise) ---
+export async function buildAboutEnTranslation(input: {
+  headline: string;
+  subheadline: string;
+  storyMarkdown: string;
+  currentFocus: string;
+  education: AboutEducationItem[];
+  skillGroups: AboutSkillGroup[];
+}): Promise<AboutTranslation> {
+  const headerLines = [
+    input.headline.replace(/\n+/g, " "),
+    input.subheadline.replace(/\n+/g, " "),
+    input.currentFocus.replace(/\n+/g, " "),
+  ];
+
+  const eduFlat = input.education.flatMap((ed) => [
+    ed.period.replace(/\n+/g, " "),
+    ed.institution.replace(/\n+/g, " "),
+    ed.title.replace(/\n+/g, " "),
+    ed.description.replace(/\n+/g, " "),
+  ]);
+
+  const skillCategories = input.skillGroups.map((g) =>
+    g.category.replace(/\n+/g, " ")
+  );
+
+  const [headersTranslated, storyMarkdown, eduTranslated, catsTranslated] =
+    await Promise.all([
+      translateTextTrToEn(headerLines.join("\n")),
+      translateMarkdownTrToEn(input.storyMarkdown),
+      eduFlat.length > 0
+        ? translateTextTrToEn(eduFlat.join("\n"))
+        : Promise.resolve(""),
+      skillCategories.length > 0
+        ? translateTextTrToEn(skillCategories.join("\n"))
+        : Promise.resolve(""),
+    ]);
+
+  const [headline, subheadline, currentFocus] = headersTranslated.split("\n");
+  const eduLines = eduTranslated ? eduTranslated.split("\n") : [];
+  const catLines = catsTranslated ? catsTranslated.split("\n") : [];
+
+  const education: AboutEducationItem[] = input.education.map((orig, idx) => {
+    const base = idx * 4;
+    return {
+      period: eduLines[base]?.trim() || orig.period,
+      institution: eduLines[base + 1]?.trim() || orig.institution,
+      title: eduLines[base + 2]?.trim() || orig.title,
+      description: eduLines[base + 3]?.trim() || orig.description,
+    };
+  });
+
+  // Translate any Turkish parenthetical notes inside skill items (e.g. "(Deneysel)" -> "(Experimental)")
+  const skillGroups: AboutSkillGroup[] = await Promise.all(
+    input.skillGroups.map(async (orig, idx) => {
+      const hasTrChars = orig.items.some((it) => /[çğıöşüÇĞİÖŞÜ]/.test(it));
+      let items = orig.items;
+      if (hasTrChars && orig.items.length > 0) {
+        const joinedItems = await translateTextTrToEn(orig.items.join("\n"));
+        const splitItems = joinedItems.split("\n").map((s) => s.trim());
+        if (splitItems.length === orig.items.length) {
+          items = splitItems;
+        }
+      }
+      return {
+        category: catLines[idx]?.trim() || orig.category,
+        items,
+      };
+    })
+  );
+
+  return {
+    headline: headline?.trim() || input.headline,
+    subheadline: subheadline?.trim() || input.subheadline,
+    storyMarkdown: storyMarkdown || input.storyMarkdown,
+    currentFocus: currentFocus?.trim() || input.currentFocus,
+    education,
+    skillGroups,
+  };
+}
+
+// --- Display Localization Helpers ---
 
 export async function localizeProfile(
   profile: SiteProfile,
@@ -294,6 +372,45 @@ export async function localizeProfile(
     heroGreeting: cached.heroGreeting,
     bio: cached.bio,
     location: cached.location || profile.location,
+  };
+}
+
+export async function localizeAbout(
+  about: AboutPageData,
+  locale: Locale
+): Promise<AboutPageData> {
+  if (locale !== "en") return about;
+  if (about.en) {
+    return {
+      ...about,
+      headline: about.en.headline || about.headline,
+      subheadline: about.en.subheadline || about.subheadline,
+      storyMarkdown: about.en.storyMarkdown || about.storyMarkdown,
+      currentFocus: about.en.currentFocus || about.currentFocus,
+      education:
+        about.en.education?.length > 0 ? about.en.education : about.education,
+      skillGroups:
+        about.en.skillGroups?.length > 0
+          ? about.en.skillGroups
+          : about.skillGroups,
+    };
+  }
+
+  const cacheKey = `${about.updatedAt || "seed"}:${about.headline.slice(0, 40)}`;
+  let cached = runtimeAboutCache.get(cacheKey);
+  if (!cached) {
+    cached = await buildAboutEnTranslation(about);
+    boundCache(runtimeAboutCache, 20);
+    runtimeAboutCache.set(cacheKey, cached);
+  }
+  return {
+    ...about,
+    headline: cached.headline,
+    subheadline: cached.subheadline,
+    storyMarkdown: cached.storyMarkdown,
+    currentFocus: cached.currentFocus,
+    education: cached.education,
+    skillGroups: cached.skillGroups,
   };
 }
 

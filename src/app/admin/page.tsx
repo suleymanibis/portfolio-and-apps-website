@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { isAuthenticated } from "@/lib/auth";
-import { getApps, getArticles, getProfile } from "@/lib/db";
+import { getAbout, getApps, getArticles, getProfile } from "@/lib/db";
 import { AdminDashboard } from "@/components/AdminDashboard";
 
 export const dynamic = "force-dynamic";
@@ -11,8 +11,9 @@ export const metadata: Metadata = {
 
 export default async function AdminPage() {
   const authenticated = await isAuthenticated();
-  const [profile, apps, articles] = await Promise.all([
+  const [profile, about, apps, articles] = await Promise.all([
     getProfile(),
+    getAbout(),
     getApps(),
     getArticles(authenticated),
   ]);
@@ -21,6 +22,7 @@ export default async function AdminPage() {
     <AdminDashboard
       initialAuthenticated={authenticated}
       initialProfile={profile}
+      initialAbout={about}
       initialApps={apps}
       initialArticles={articles}
     />
