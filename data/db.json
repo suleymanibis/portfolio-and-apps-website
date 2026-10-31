@@ -22,6 +22,143 @@
       "location": "Türkiye"
     }
   },
-  "apps": [],
+  "about": {
+    "headline": "Merhaba, ben Süleyman İbiş.",
+    "subheadline": "Akdeniz Üniversitesi Bilgisayar Mühendisliği 1. sınıf öğrencisiyim. Backend sistemleri araştırmaya, öğrenmeye ve uçtan uca çalışan yazılımlar geliştirmeye odaklanıyorum.",
+    "photoUrl": "",
+    "cvUrl": "",
+    "currentFocus": "Şu sıralar backend sistemlerinin mimarisini araştırıp öğreniyor; Java (Spring Boot & Hibernate), PostgreSQL ve bu servislerle haberleşen Python CLI ile C# (.NET) istemci uygulamaları geliştiriyorum.",
+    "storyMarkdown": "## Yazılım Yolculuğum Nasıl Başladı?\n\nBilgisayarlara ve yazılıma olan merakım ortaokul **5. sınıftaki bilgisayar dersinde** başladı. Ekranda gördüğüm programların arka planda nasıl çalıştığını kurcalama isteği, zamanla kendi araçlarımı ve projelerimi üretme tutkusuna dönüştü.\n\nAntalya'da **Akdeniz Üniversitesi**'nde **B2** seviyesinde İngilizce hazırlık eğitimimi tamamladıktan sonra şu an **Bilgisayar Mühendisliği 1. sınıf** öğrencisi olarak akademik eğitimime devam ediyorum.\n\n## Nasıl Üretiyor ve Neye Odaklanıyorum?\n\nBir yazılımı yalnızca tek bir katmandan ibaret görmek yerine, arka uçtan istemciye kadar **uçtan uca nasıl haberleştiğini** deneyimleyerek öğrenmeyi seviyorum. Örneğin Java ile geliştirdiğim bir e-ticaret REST API servisini hem **Python** tabanlı bir komut satırı (CLI) istemcisiyle hem de **C# (.NET WinForms)** ile yazdığım masaüstü arayüzüyle entegre ederek çok katmanlı sistem pratikleri yapıyorum.\n\nFarklı disiplinleri tanımak adına zaman zaman *Unity* ve *Godot* gibi oyun motorlarıyla da kişisel denemeler yaptım; ancak asıl enerjimi ve mühendislik odağımı **backend sistemleri, API tasarımı ve veritabanı mimarisi** üzerine kurdum.",
+    "education": [
+      {
+        "period": "2026 — Günümüz",
+        "institution": "Akdeniz Üniversitesi",
+        "title": "Bilgisayar Mühendisliği Lisans (1. Sınıf)",
+        "description": "Antalya'da bilgisayar bilimleri temelleri, algoritmalar ve yazılım mühendisliği üzerine lisans eğitimime devam ediyorum."
+      },
+      {
+        "period": "2025 — 2026",
+        "institution": "Akdeniz Üniversitesi Yabancı Diller Yüksekokulu",
+        "title": "İngilizce Hazırlık Eğitimi (B2 Seviyesi)",
+        "description": "Global teknik dokümantasyonları ve yazılım kaynaklarını doğrudan takip edebilecek yetkinlikte B2 seviye İngilizce hazırlık eğitimini tamamladım."
+      }
+    ],
+    "skillGroups": [
+      {
+        "category": "Diller & Backend Teknolojileri",
+        "items": [
+          "Java",
+          "Spring Boot",
+          "Hibernate",
+          "Python",
+          "C#",
+          ".NET (WinForms)",
+          "RESTful API",
+          "PostgreSQL"
+        ]
+      },
+      {
+        "category": "IDE & Geliştirme Ortamları",
+        "items": [
+          "IntelliJ IDEA",
+          "VS Code",
+          "Visual Studio",
+          "Eclipse",
+          "Atom",
+          "Git & GitHub"
+        ]
+      },
+      {
+        "category": "Bulut, Dağıtım & Keşfettiklerim",
+        "items": [
+          "Vercel",
+          "Render",
+          "CLI & Masaüstü İstemciler",
+          "Unity & Godot (Kişisel Denemeler)"
+        ]
+      }
+    ],
+    "en": {
+      "headline": "Hi there, I'm Süleyman İbiş.",
+      "subheadline": "First-year Computer Engineering student at Akdeniz University, focused on researching, learning, and building reliable backend systems and end-to-end software.",
+      "currentFocus": "Currently researching and learning backend system architectures while building practical services with Java (Spring Boot & Hibernate), PostgreSQL, and multi-client tools in Python CLI and C# (.NET).",
+      "storyMarkdown": "## How My Software Journey Started\n\nMy curiosity for computers and software sparked back in **5th-grade computer class**. Wanting to understand how the programs on my screen actually worked behind the scenes gradually evolved into a passion for building software of my own.\n\nAfter completing my **B2-level** English preparatory year at **Akdeniz University** in Antalya, I am currently pursuing my **first year in Computer Engineering**.\n\n## How I Build & What I Focus On\n\nRather than viewing software through a single layer, I enjoy learning how systems communicate **end to end**—from database and API design all the way to client applications. For example, I built a Java e-commerce REST API and paired it with both a **Python CLI** client and a **C# (.NET WinForms)** desktop interface to practice multi-client architecture firsthand.\n\nOut of curiosity for different domains, I have also experimented locally with game engines like *Unity* and *Godot*, while dedicating my main engineering focus to **backend systems, RESTful APIs, and database architecture**.",
+      "education": [
+        {
+          "period": "2026 — Present",
+          "institution": "Akdeniz University",
+          "title": "B.Sc. in Computer Engineering (Freshman / Year 1)",
+          "description": "Pursuing undergraduate studies in computer science fundamentals, algorithms, and software engineering in Antalya, Türkiye."
+        },
+        {
+          "period": "2025 — 2026",
+          "institution": "Akdeniz University School of Foreign Languages",
+          "title": "English Preparatory Program (B2 Level)",
+          "description": "Completed intensive B2-level English preparatory education, enabling fluent engagement with technical documentation and engineering literature."
+        }
+      ],
+      "skillGroups": [
+        {
+          "category": "Languages & Backend Stack",
+          "items": [
+            "Java",
+            "Spring Boot",
+            "Hibernate",
+            "Python",
+            "C#",
+            ".NET (WinForms)",
+            "RESTful API",
+            "PostgreSQL"
+          ]
+        },
+        {
+          "category": "IDEs & Development Environments",
+          "items": [
+            "IntelliJ IDEA",
+            "VS Code",
+            "Visual Studio",
+            "Eclipse",
+            "Atom",
+            "Git & GitHub"
+          ]
+        },
+        {
+          "category": "Deployment & Explored Tools",
+          "items": [
+            "Vercel",
+            "Render",
+            "CLI & Desktop Clients",
+            "Unity & Godot (Personal Exploration)"
+          ]
+        }
+      ]
+    }
+  },
+  "apps": [
+    {
+      "title": "Deneme",
+      "slug": "deneme",
+      "tagline": "Deneme",
+      "description": "Deneme",
+      "coverImage": "",
+      "category": "Web Uygulaması",
+      "techStack": [],
+      "demoUrl": "",
+      "repoUrl": "",
+      "downloadUrl": "",
+      "version": "v1.0.0",
+      "status": "live",
+      "featured": true,
+      "en": {
+        "title": "trial",
+        "tagline": "trial",
+        "description": "Attempt",
+        "category": "Web Application"
+      },
+      "id": "app-1793462496050",
+      "createdAt": "2026-10-31T16:01:36.050Z",
+      "updatedAt": "2026-10-31T16:01:36.050Z"
+    }
+  ],
   "articles": []
 }
