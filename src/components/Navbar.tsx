@@ -12,21 +12,26 @@ import {
   Menu,
   X,
 } from "lucide-react";
+import type { Locale } from "@/types";
+import { dictionaries } from "@/lib/i18n";
 import { ThemeToggle } from "./ThemeToggle";
+import { LanguageToggle } from "./LanguageToggle";
 
 interface NavbarProps {
   siteName: string;
+  locale?: Locale;
 }
 
-export function Navbar({ siteName }: NavbarProps) {
+export function Navbar({ siteName, locale = "tr" }: NavbarProps) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const t = dictionaries[locale]?.nav ?? dictionaries.tr.nav;
 
   const navLinks = [
-    { href: "/", label: "Ana Sayfa", icon: Code2 },
-    { href: "/apps", label: "Uygulamalar", icon: Layers },
-    { href: "/repos", label: "GitHub Repoları", icon: FolderGit2 },
-    { href: "/articles", label: "Makaleler", icon: FileText },
+    { href: "/", label: t.home, icon: Code2 },
+    { href: "/apps", label: t.apps, icon: Layers },
+    { href: "/repos", label: t.repos, icon: FolderGit2 },
+    { href: "/articles", label: t.articles, icon: FileText },
   ];
 
   const isActive = (href: string) =>
@@ -82,7 +87,8 @@ export function Navbar({ siteName }: NavbarProps) {
           })}
         </nav>
 
-        <div className="hidden md:flex items-center gap-2.5">
+        <div className="hidden md:flex items-center gap-2">
+          <LanguageToggle locale={locale} />
           <ThemeToggle />
           <Link
             href="/admin"
@@ -94,17 +100,18 @@ export function Navbar({ siteName }: NavbarProps) {
             }`}
           >
             <LayoutDashboard className="w-3.5 h-3.5" />
-            <span>Yönetim</span>
+            <span>{t.admin}</span>
           </Link>
         </div>
 
         {/* Mobile Controls */}
-        <div className="flex md:hidden items-center gap-2">
+        <div className="flex md:hidden items-center gap-1.5">
+          <LanguageToggle locale={locale} />
           <ThemeToggle />
           <button
             type="button"
             onClick={() => setMobileOpen(!mobileOpen)}
-            aria-label="Menüyü aç/kapat"
+            aria-label={t.toggleMenu}
             className="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-slate-200 dark:border-zinc-800 text-slate-700 dark:text-zinc-300"
           >
             {mobileOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
@@ -141,7 +148,7 @@ export function Navbar({ siteName }: NavbarProps) {
             className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-semibold text-indigo-600 dark:text-indigo-400"
           >
             <LayoutDashboard className="w-4 h-4" />
-            <span>Yönetim Paneli</span>
+            <span>{t.adminPanel}</span>
           </Link>
         </div>
       )}

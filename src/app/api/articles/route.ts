@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 import { createArticle, getArticles } from "@/lib/db";
 import { isAuthenticated } from "@/lib/auth";
 import { calculateReadingTime, slugify } from "@/lib/utils";
+import { buildArticleEnTranslation } from "@/lib/translator";
 import {
   checkMutationRateLimit,
   cleanStringArray,
@@ -50,6 +51,16 @@ export async function POST(request: Request) {
     const excerpt =
       cleanText(body.excerpt, 400) ||
       content.replace(/[#>*_`~\-\[\]()]/g, "").slice(0, 180).trim() + "...";
+    const category = cleanText(body.category, 60) || "Genel";
+    const tags = cleanStringArray(body.tags, 20, 40);
+
+    const en = await buildArticleEnTranslation({
+      title,
+      excerpt,
+      content,
+      category,
+      tags,
+    });
 
     const created = await createArticle({
       title,
@@ -57,11 +68,12 @@ export async function POST(request: Request) {
       excerpt,
       content,
       coverImage: sanitizeImageUrl(body.coverImage),
-      category: cleanText(body.category, 60) || "Genel",
-      tags: cleanStringArray(body.tags, 20, 40),
+      category,
+      tags,
       published: body.published !== undefined ? Boolean(body.published) : true,
       featured: Boolean(body.featured),
       readingTimeMinutes: calculateReadingTime(content),
+      en,
     });
 
     revalidatePath("/");

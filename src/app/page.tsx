@@ -14,6 +14,13 @@ import {
 } from "lucide-react";
 import { getApps, getArticles, getProfile } from "@/lib/db";
 import { getPinnedRepos } from "@/lib/github";
+import { getDictionary, getLocale } from "@/lib/i18n";
+import {
+  localizeApps,
+  localizeArticles,
+  localizePinnedRepos,
+  localizeProfile,
+} from "@/lib/translator";
 import { AppCard } from "@/components/AppCard";
 import { ArticleCard } from "@/components/ArticleCard";
 import { PinnedRepoCard } from "@/components/PinnedRepoCard";
@@ -21,16 +28,26 @@ import { PinnedRepoCard } from "@/components/PinnedRepoCard";
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const profile = await getProfile();
-  const [apps, articles, pinnedRepos] = await Promise.all([
+  const [locale, rawProfile] = await Promise.all([getLocale(), getProfile()]);
+  const dict = getDictionary(locale);
+
+  const [rawApps, rawArticles, rawPinnedRepos] = await Promise.all([
     getApps(),
     getArticles(false),
-    getPinnedRepos(profile.githubUrl),
+    getPinnedRepos(rawProfile.githubUrl),
   ]);
 
-  const featuredApps = apps.filter((a) => a.featured).slice(0, 3);
-  const displayApps = featuredApps.length > 0 ? featuredApps : apps.slice(0, 3);
-  const latestArticles = articles.slice(0, 4);
+  const rawFeaturedApps = rawApps.filter((a) => a.featured).slice(0, 3);
+  const selectedRawApps =
+    rawFeaturedApps.length > 0 ? rawFeaturedApps : rawApps.slice(0, 3);
+  const selectedRawArticles = rawArticles.slice(0, 4);
+
+  const [profile, displayApps, latestArticles, pinnedRepos] = await Promise.all([
+    localizeProfile(rawProfile, locale),
+    localizeApps(selectedRawApps, locale),
+    localizeArticles(selectedRawArticles, locale),
+    localizePinnedRepos(rawPinnedRepos.slice(0, 6), locale),
+  ]);
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16 space-y-20">
@@ -44,7 +61,7 @@ export default async function HomePage() {
             {profile.availableForWork && (
               <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                Yeni projelere & iş birliklerine açık
+                {dict.hero.available}
               </span>
             )}
             {profile.location && (
@@ -73,21 +90,21 @@ export default async function HomePage() {
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm bg-indigo-600 hover:bg-indigo-500 text-white shadow-sm transition-colors"
             >
               <Layers className="w-4 h-4" />
-              <span>Uygulamaları Keşfet</span>
+              <span>{dict.hero.exploreApps}</span>
             </Link>
             <Link
               href="/repos"
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:border-indigo-500/50 text-slate-800 dark:text-zinc-200 transition-colors"
             >
               <FolderGit2 className="w-4 h-4" />
-              <span>GitHub Repoları</span>
+              <span>{dict.hero.githubRepos}</span>
             </Link>
             <Link
               href="/articles"
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:border-indigo-500/50 text-slate-800 dark:text-zinc-200 transition-colors"
             >
               <FileText className="w-4 h-4" />
-              <span>Makaleleri Oku</span>
+              <span>{dict.hero.readArticles}</span>
             </Link>
 
             <div className="flex items-center gap-1.5 sm:ml-1">
@@ -127,7 +144,7 @@ export default async function HomePage() {
               {profile.email && (
                 <a
                   href={`mailto:${profile.email}`}
-                  aria-label="E-posta"
+                  aria-label="Email"
                   className="p-2.5 rounded-xl border border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white hover:border-slate-300 dark:hover:border-zinc-700 transition-colors"
                 >
                   <Mail className="w-4 h-4" />
@@ -141,26 +158,26 @@ export default async function HomePage() {
         <div className="relative grid grid-cols-3 gap-4 mt-10 pt-8 border-t border-slate-200/70 dark:border-zinc-800/80">
           <div>
             <p className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
-              {apps.length}
+              {rawApps.length}
             </p>
             <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400">
-              Yayınlanan Uygulama
+              {dict.hero.statApps}
             </p>
           </div>
           <div>
             <p className="text-2xl sm:text-3xl font-extrabold text-indigo-600 dark:text-indigo-400">
-              {pinnedRepos.length}
+              {rawPinnedRepos.length}
             </p>
             <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400">
-              Sabitli GitHub Reposu
+              {dict.hero.statRepos}
             </p>
           </div>
           <div>
             <p className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
-              {articles.length}
+              {rawArticles.length}
             </p>
             <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400">
-              Teknik Makale & Yazı
+              {dict.hero.statArticles}
             </p>
           </div>
         </div>
@@ -173,26 +190,29 @@ export default async function HomePage() {
             <div>
               <div className="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-wider text-indigo-600 dark:text-indigo-400 mb-1">
                 <Pin className="w-3.5 h-3.5" />
-                <span>GitHub • Sabitlenenler</span>
+                <span>{dict.home.pinnedBadge}</span>
               </div>
               <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
-                Sabitlenen GitHub Repolarım
+                {dict.home.pinnedTitle}
               </h2>
             </div>
             <Link
               href="/repos"
               className="inline-flex items-center gap-1.5 text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:underline shrink-0"
             >
-              <span>Tümünü Gör ({pinnedRepos.length})</span>
+              <span>
+                {dict.home.viewAll} ({rawPinnedRepos.length})
+              </span>
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {pinnedRepos.slice(0, 6).map((repo) => (
+            {pinnedRepos.map((repo) => (
               <PinnedRepoCard
                 key={`${repo.owner}/${repo.name}`}
                 repo={repo}
+                locale={locale}
               />
             ))}
           </div>
@@ -205,33 +225,31 @@ export default async function HomePage() {
           <div>
             <div className="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-wider text-indigo-600 dark:text-indigo-400 mb-1">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Uygulama Vitrini</span>
+              <span>{dict.home.appsBadge}</span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
-              Geliştirdiğim Uygulamalar
+              {dict.home.appsTitle}
             </h2>
           </div>
           <Link
             href="/apps"
             className="inline-flex items-center gap-1.5 text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:underline shrink-0"
           >
-            <span>Tümünü Gör ({apps.length})</span>
+            <span>
+              {dict.home.viewAll} ({rawApps.length})
+            </span>
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
 
         {displayApps.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-slate-300 dark:border-zinc-800 p-10 text-center text-slate-500 dark:text-zinc-400">
-            Henüz uygulama eklenmemiş.{" "}
-            <Link href="/admin" className="text-indigo-500 underline">
-              Yönetim Panelinden
-            </Link>{" "}
-            ilk uygulamanızı paylaşabilirsiniz.
+            {dict.home.noApps}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {displayApps.map((app) => (
-              <AppCard key={app.id} app={app} />
+              <AppCard key={app.id} app={app} locale={locale} />
             ))}
           </div>
         )}
@@ -243,33 +261,31 @@ export default async function HomePage() {
           <div>
             <div className="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-wider text-indigo-600 dark:text-indigo-400 mb-1">
               <FileText className="w-3.5 h-3.5" />
-              <span>Blog & Notlar</span>
+              <span>{dict.home.articlesBadge}</span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
-              Son Yazılan Makaleler
+              {dict.home.articlesTitle}
             </h2>
           </div>
           <Link
             href="/articles"
             className="inline-flex items-center gap-1.5 text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:underline shrink-0"
           >
-            <span>Tüm Yazılar ({articles.length})</span>
+            <span>
+              {dict.home.allArticles} ({rawArticles.length})
+            </span>
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
 
         {latestArticles.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-slate-300 dark:border-zinc-800 p-10 text-center text-slate-500 dark:text-zinc-400">
-            Henüz yayınlanmış makale bulunmuyor.{" "}
-            <Link href="/admin" className="text-indigo-500 underline">
-              Yönetim Panelinden
-            </Link>{" "}
-            yeni bir yazı oluşturabilirsiniz.
+            {dict.home.noArticles}
           </div>
         ) : (
           <div className="space-y-4">
             {latestArticles.map((article) => (
-              <ArticleCard key={article.id} article={article} />
+              <ArticleCard key={article.id} article={article} locale={locale} />
             ))}
           </div>
         )}

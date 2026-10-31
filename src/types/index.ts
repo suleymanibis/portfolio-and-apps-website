@@ -1,4 +1,13 @@
+export type Locale = "tr" | "en";
+
 export type AppStatus = "live" | "beta" | "in-progress" | "open-source";
+
+export interface AppTranslation {
+  title: string;
+  tagline: string;
+  description: string;
+  category: string;
+}
 
 export interface AppItem {
   id: string;
@@ -17,6 +26,15 @@ export interface AppItem {
   featured: boolean;
   createdAt: string;
   updatedAt: string;
+  en?: AppTranslation;
+}
+
+export interface ArticleTranslation {
+  title: string;
+  excerpt: string;
+  content: string;
+  category: string;
+  tags: string[];
 }
 
 export interface ArticleItem {
@@ -33,6 +51,14 @@ export interface ArticleItem {
   readingTimeMinutes: number;
   createdAt: string;
   updatedAt: string;
+  en?: ArticleTranslation;
+}
+
+export interface ProfileTranslation {
+  roleTitle: string;
+  heroGreeting: string;
+  bio: string;
+  location?: string;
 }
 
 export interface SiteProfile {
@@ -48,6 +74,7 @@ export interface SiteProfile {
   twitterUrl?: string;
   linkedinUrl?: string;
   email?: string;
+  en?: ProfileTranslation;
 }
 
 export interface PinnedRepoItem {

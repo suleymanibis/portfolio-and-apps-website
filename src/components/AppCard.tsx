@@ -1,15 +1,26 @@
 import Link from "next/link";
 import { ArrowUpRight, ExternalLink, Github, Layers } from "lucide-react";
-import { AppItem } from "@/types";
-import { statusLabels } from "@/lib/utils";
+import type { AppItem, Locale } from "@/types";
+import { getStatusInfo } from "@/lib/utils";
+import { dictionaries } from "@/lib/i18n";
 
-export function AppCard({ app }: { app: AppItem }) {
-  const statusInfo = statusLabels[app.status] || statusLabels.live;
+export function AppCard({
+  app,
+  locale = "tr",
+}: {
+  app: AppItem;
+  locale?: Locale;
+}) {
+  const statusInfo = getStatusInfo(app.status, locale);
+  const t = dictionaries[locale]?.apps ?? dictionaries.tr.apps;
 
   return (
     <div className="group relative flex flex-col rounded-2xl border border-slate-200 dark:border-zinc-800/90 bg-white dark:bg-zinc-900/60 hover:border-indigo-500/50 dark:hover:border-indigo-500/50 transition-all duration-200 overflow-hidden shadow-xs hover:shadow-md">
       {/* Cover */}
-      <Link href={`/apps/${app.slug}`} className="block relative h-44 overflow-hidden bg-gradient-to-br from-indigo-600/20 via-violet-600/15 to-sky-500/20 dark:from-indigo-500/15 dark:via-violet-500/10 dark:to-zinc-900">
+      <Link
+        href={`/apps/${app.slug}`}
+        className="block relative h-44 overflow-hidden bg-gradient-to-br from-indigo-600/20 via-violet-600/15 to-sky-500/20 dark:from-indigo-500/15 dark:via-violet-500/10 dark:to-zinc-900"
+      >
         {app.coverImage ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -89,7 +100,7 @@ export function AppCard({ app }: { app: AppItem }) {
             href={`/apps/${app.slug}`}
             className="text-indigo-600 dark:text-indigo-400 hover:underline"
           >
-            Detayları İncele
+            {t.viewDetails}
           </Link>
           <div className="flex items-center gap-3">
             {app.repoUrl && (
@@ -97,11 +108,11 @@ export function AppCard({ app }: { app: AppItem }) {
                 href={app.repoUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                title="Kaynak Kod"
+                title={t.sourceCode}
                 className="inline-flex items-center gap-1 text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white transition-colors"
               >
                 <Github className="w-3.5 h-3.5" />
-                <span>Kod</span>
+                <span>{t.code}</span>
               </a>
             )}
             {app.demoUrl && (
@@ -109,11 +120,11 @@ export function AppCard({ app }: { app: AppItem }) {
                 href={app.demoUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                title="Canlı Demo"
+                title={t.demo}
                 className="inline-flex items-center gap-1 text-slate-500 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
               >
                 <ExternalLink className="w-3.5 h-3.5" />
-                <span>Demo</span>
+                <span>{t.demo}</span>
               </a>
             )}
           </div>

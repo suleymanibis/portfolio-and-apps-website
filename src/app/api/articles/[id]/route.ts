@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
-import { deleteArticle, updateArticle } from "@/lib/db";
+import { deleteArticle, getArticles, updateArticle } from "@/lib/db";
 import { isAuthenticated } from "@/lib/auth";
 import { calculateReadingTime, slugify } from "@/lib/utils";
+import { buildArticleEnTranslation } from "@/lib/translator";
 import {
   checkMutationRateLimit,
   cleanStringArray,
@@ -37,6 +38,11 @@ export async function PUT(
   if (!parsedBody.ok) return parsedBody.response;
 
   try {
+    const existing = (await getArticles(true)).find((a) => a.id === id);
+    if (!existing) {
+      return NextResponse.json({ error: "Makale bulunamadı." }, { status: 404 });
+    }
+
     const body = parsedBody.data;
     const sanitizedUpdates: Partial<ArticleItem> = {};
     if (body.title !== undefined)
@@ -63,6 +69,14 @@ export async function PUT(
       sanitizedUpdates.published = Boolean(body.published);
     if (body.featured !== undefined)
       sanitizedUpdates.featured = Boolean(body.featured);
+
+    sanitizedUpdates.en = await buildArticleEnTranslation({
+      title: sanitizedUpdates.title ?? existing.title,
+      excerpt: sanitizedUpdates.excerpt ?? existing.excerpt,
+      content: sanitizedUpdates.content ?? existing.content,
+      category: sanitizedUpdates.category ?? existing.category,
+      tags: sanitizedUpdates.tags ?? existing.tags,
+    });
 
     const updated = await updateArticle(id, sanitizedUpdates);
     if (!updated) {

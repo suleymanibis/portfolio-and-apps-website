@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { getProfile, updateProfile } from "@/lib/db";
 import { isAuthenticated } from "@/lib/auth";
+import { buildProfileEnTranslation } from "@/lib/translator";
 import {
   checkMutationRateLimit,
   cleanText,
@@ -37,19 +38,32 @@ export async function PUT(request: Request) {
     const validEmail =
       !emailRaw || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailRaw) ? emailRaw : "";
 
+    const roleTitle = cleanText(body.roleTitle, 120);
+    const heroGreeting = cleanText(body.heroGreeting, 240);
+    const bio = cleanText(body.bio, 1000);
+    const location = cleanText(body.location, 80);
+
+    const en = await buildProfileEnTranslation({
+      roleTitle,
+      heroGreeting,
+      bio,
+      location,
+    });
+
     const safeProfile: Partial<SiteProfile> = {
       siteName: cleanText(body.siteName, 60) || "suleymanibis.dev",
       ownerName: cleanText(body.ownerName, 80) || "Süleyman İbiş",
-      roleTitle: cleanText(body.roleTitle, 120),
-      heroGreeting: cleanText(body.heroGreeting, 240),
-      bio: cleanText(body.bio, 1000),
+      roleTitle,
+      heroGreeting,
+      bio,
       avatarUrl: sanitizeImageUrl(body.avatarUrl),
-      location: cleanText(body.location, 80),
+      location,
       availableForWork: Boolean(body.availableForWork),
       githubUrl: sanitizeHttpUrl(body.githubUrl),
       twitterUrl: sanitizeHttpUrl(body.twitterUrl),
       linkedinUrl: sanitizeHttpUrl(body.linkedinUrl),
       email: validEmail,
+      en,
     };
 
     const updated = await updateProfile(safeProfile);

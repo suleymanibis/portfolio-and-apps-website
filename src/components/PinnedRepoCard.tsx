@@ -6,10 +6,19 @@ import {
   Pin,
   Star,
 } from "lucide-react";
-import { PinnedRepoItem } from "@/types";
-import { formatDateTR } from "@/lib/utils";
+import type { Locale, PinnedRepoItem } from "@/types";
+import { formatDate } from "@/lib/utils";
+import { dictionaries } from "@/lib/i18n";
 
-export function PinnedRepoCard({ repo }: { repo: PinnedRepoItem }) {
+export function PinnedRepoCard({
+  repo,
+  locale = "tr",
+}: {
+  repo: PinnedRepoItem;
+  locale?: Locale;
+}) {
+  const t = dictionaries[locale]?.repos ?? dictionaries.tr.repos;
+
   return (
     <div className="group flex flex-col justify-between rounded-2xl border border-slate-200 dark:border-zinc-800/90 bg-white dark:bg-zinc-900/60 hover:border-indigo-500/50 dark:hover:border-indigo-500/50 p-5 transition-all duration-200 shadow-xs hover:shadow-md">
       <div className="space-y-3">
@@ -29,13 +38,13 @@ export function PinnedRepoCard({ repo }: { repo: PinnedRepoItem }) {
 
           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 dark:bg-zinc-800/90 text-slate-600 dark:text-zinc-400 border border-slate-200/70 dark:border-zinc-700/70 shrink-0">
             <Pin className="w-3 h-3 text-indigo-500" />
-            <span>Sabitli</span>
+            <span>{t.pinnedTag}</span>
           </span>
         </div>
 
         {/* Description */}
         <p className="text-sm text-slate-600 dark:text-zinc-400 line-clamp-3 leading-relaxed">
-          {repo.description || "GitHub üzerinde paylaşılan açık kaynak yazılım deposu."}
+          {repo.description || t.defaultDesc}
         </p>
 
         {/* Topics if available */}
@@ -67,14 +76,14 @@ export function PinnedRepoCard({ repo }: { repo: PinnedRepoItem }) {
           )}
 
           {repo.stars > 0 && (
-            <span className="inline-flex items-center gap-1" title="Yıldız">
+            <span className="inline-flex items-center gap-1" title="Stars">
               <Star className="w-3.5 h-3.5 text-amber-500" />
               <span>{repo.stars}</span>
             </span>
           )}
 
           {repo.forks > 0 && (
-            <span className="inline-flex items-center gap-1" title="Fork">
+            <span className="inline-flex items-center gap-1" title="Forks">
               <GitFork className="w-3.5 h-3.5" />
               <span>{repo.forks}</span>
             </span>
@@ -82,7 +91,7 @@ export function PinnedRepoCard({ repo }: { repo: PinnedRepoItem }) {
 
           {repo.updatedAt && repo.stars === 0 && repo.forks === 0 && (
             <span className="text-[11px] text-slate-400 dark:text-zinc-500">
-              {formatDateTR(repo.updatedAt)}
+              {formatDate(repo.updatedAt, locale)}
             </span>
           )}
         </div>
@@ -96,7 +105,7 @@ export function PinnedRepoCard({ repo }: { repo: PinnedRepoItem }) {
               className="inline-flex items-center gap-1 font-medium text-slate-600 dark:text-zinc-300 hover:text-indigo-500 transition-colors"
             >
               <ExternalLink className="w-3.5 h-3.5" />
-              <span>Canlı</span>
+              <span>{t.liveLink}</span>
             </a>
           )}
           <a

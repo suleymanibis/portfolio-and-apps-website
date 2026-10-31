@@ -4,9 +4,19 @@ import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Check, Copy } from "lucide-react";
+import type { Locale } from "@/types";
+import { dictionaries } from "@/lib/i18n";
 import { sanitizeImageUrl, sanitizeMarkdownHref } from "@/lib/security";
 
-function CopyCodeButton({ code }: { code: string }) {
+function CopyCodeButton({
+  code,
+  copyLabel,
+  copiedLabel,
+}: {
+  code: string;
+  copyLabel: string;
+  copiedLabel: string;
+}) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
@@ -24,19 +34,27 @@ function CopyCodeButton({ code }: { code: string }) {
       {copied ? (
         <>
           <Check className="w-3.5 h-3.5 text-emerald-400" />
-          <span>Kopyalandı</span>
+          <span>{copiedLabel}</span>
         </>
       ) : (
         <>
           <Copy className="w-3.5 h-3.5" />
-          <span>Kopyala</span>
+          <span>{copyLabel}</span>
         </>
       )}
     </button>
   );
 }
 
-export function MarkdownRenderer({ content }: { content: string }) {
+export function MarkdownRenderer({
+  content,
+  locale = "tr",
+}: {
+  content: string;
+  locale?: Locale;
+}) {
+  const t = dictionaries[locale]?.articles ?? dictionaries.tr.articles;
+
   return (
     <div className="space-y-4 text-slate-700 dark:text-zinc-300 leading-relaxed">
       <ReactMarkdown
@@ -123,7 +141,11 @@ export function MarkdownRenderer({ content }: { content: string }) {
               <div className="my-5 rounded-xl overflow-hidden border border-zinc-800 bg-zinc-950 text-zinc-100 shadow-sm">
                 <div className="flex items-center justify-between px-4 py-2 bg-zinc-900 border-b border-zinc-800 text-xs font-mono text-zinc-400">
                   <span>{match ? match[1] : "code"}</span>
-                  <CopyCodeButton code={codeText} />
+                  <CopyCodeButton
+                    code={codeText}
+                    copyLabel={t.copyCode}
+                    copiedLabel={t.copiedCode}
+                  />
                 </div>
                 <pre className="p-4 overflow-x-auto text-sm font-mono leading-relaxed">
                   <code>{codeText}</code>

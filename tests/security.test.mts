@@ -221,3 +221,45 @@ test("7. Binary magic-byte image validator accepts real raster images & blocks S
   assert.equal(detectSafeImageExtension(svgXss), null);
   assert.equal(detectSafeImageExtension(htmlFile), null);
 });
+
+test("8. Bilingual i18n dictionary & Markdown translator preserve code blocks and URLs", async () => {
+  const { getDictionary } = await import("../src/lib/i18n.ts");
+  const { getStatusInfo } = await import("../src/lib/utils.ts");
+  const { translateMarkdownTrToEn } = await import("../src/lib/translator.ts");
+
+  assert.equal(getDictionary("tr").nav.articles, "Makaleler");
+  assert.equal(getDictionary("en").nav.articles, "Articles");
+  assert.equal(getStatusInfo("open-source", "tr").label, "Açık Kaynak");
+  assert.equal(getStatusInfo("open-source", "en").label, "Open Source");
+
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (_input, init) => {
+    const params = new URLSearchParams(String(init?.body || ""));
+    const q = params.get("q") || "";
+    const mocked = q
+      .replace("Başlık", "Heading")
+      .replace("Merhaba", "Hello")
+      .replace("tıklayın", "click here");
+    return Response.json([[[mocked, q]]]);
+  };
+
+  try {
+    const md = [
+      "## Başlık",
+      "",
+      "Merhaba `const x = 42;` ve [tıklayın](https://suleymanibis.dev/apps)",
+      "",
+      "```typescript",
+      "const gizliKod = 'degismemeli';",
+      "```",
+    ].join("\n");
+
+    const out = await translateMarkdownTrToEn(md);
+    assert.ok(out.includes("## Heading"));
+    assert.ok(out.includes("`const x = 42;`"));
+    assert.ok(out.includes("[click here](https://suleymanibis.dev/apps)"));
+    assert.ok(out.includes("const gizliKod = 'degismemeli';"));
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});

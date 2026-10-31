@@ -1,3 +1,5 @@
+import type { Locale } from "@/types";
+
 const trMap: Record<string, string> = {
   ç: "c",
   Ç: "c",
@@ -31,9 +33,9 @@ export function calculateReadingTime(markdown: string): number {
   return Math.max(1, Math.ceil(words / 200));
 }
 
-export function formatDateTR(isoDate: string): string {
+export function formatDate(isoDate: string, locale: Locale = "tr"): string {
   try {
-    return new Intl.DateTimeFormat("tr-TR", {
+    return new Intl.DateTimeFormat(locale === "en" ? "en-US" : "tr-TR", {
       day: "numeric",
       month: "long",
       year: "numeric",
@@ -41,6 +43,10 @@ export function formatDateTR(isoDate: string): string {
   } catch {
     return isoDate;
   }
+}
+
+export function formatDateTR(isoDate: string): string {
+  return formatDate(isoDate, "tr");
 }
 
 export const statusLabels: Record<string, { label: string; colorClass: string }> = {
@@ -65,3 +71,24 @@ export const statusLabels: Record<string, { label: string; colorClass: string }>
       "bg-violet-500/15 text-violet-600 dark:text-violet-400 border-violet-500/30",
   },
 };
+
+const statusLabelsEn: Record<string, string> = {
+  live: "Live",
+  beta: "Beta",
+  "in-progress": "In Progress",
+  "open-source": "Open Source",
+};
+
+export function getStatusInfo(
+  status: string,
+  locale: Locale = "tr"
+): { label: string; colorClass: string } {
+  const base = statusLabels[status] || statusLabels.live;
+  if (locale === "en") {
+    return {
+      label: statusLabelsEn[status] || statusLabelsEn.live,
+      colorClass: base.colorClass,
+    };
+  }
+  return base;
+}

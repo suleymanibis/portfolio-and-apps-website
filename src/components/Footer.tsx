@@ -1,8 +1,17 @@
 import Link from "next/link";
 import { Github, Linkedin, Mail, Twitter } from "lucide-react";
-import { SiteProfile } from "@/types";
+import type { Locale, SiteProfile } from "@/types";
+import { getDictionary } from "@/lib/i18n";
 
-export function Footer({ profile }: { profile: SiteProfile }) {
+export function Footer({
+  profile,
+  locale = "tr",
+}: {
+  profile: SiteProfile;
+  locale?: Locale;
+}) {
+  const dict = getDictionary(locale);
+
   return (
     <footer className="border-t border-slate-200 dark:border-zinc-800/80 bg-white/60 dark:bg-zinc-950/60 mt-20">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -20,7 +29,7 @@ export function Footer({ profile }: { profile: SiteProfile }) {
               {profile.siteName}
             </p>
             <p className="text-xs text-slate-500 dark:text-zinc-500 mt-0.5">
-              © {new Date().getFullYear()} {profile.ownerName}. Tüm hakları saklıdır.
+              © {new Date().getFullYear()} {profile.ownerName}. {dict.footer.rights}
             </p>
           </div>
         </div>
@@ -62,7 +71,7 @@ export function Footer({ profile }: { profile: SiteProfile }) {
           {profile.email && (
             <a
               href={`mailto:${profile.email}`}
-              aria-label="E-posta"
+              aria-label="Email"
               className="p-2 rounded-lg text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-zinc-900 transition-colors"
             >
               <Mail className="w-4 h-4" />
@@ -74,7 +83,7 @@ export function Footer({ profile }: { profile: SiteProfile }) {
             prefetch={false}
             className="text-xs text-slate-500 dark:text-zinc-500 hover:text-indigo-500 transition-colors"
           >
-            Yönetim
+            {dict.footer.admin}
           </Link>
         </div>
       </div>

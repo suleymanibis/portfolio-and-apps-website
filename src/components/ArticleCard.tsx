@@ -1,9 +1,18 @@
 import Link from "next/link";
 import { ArrowRight, Calendar, Clock } from "lucide-react";
-import { ArticleItem } from "@/types";
-import { formatDateTR } from "@/lib/utils";
+import type { ArticleItem, Locale } from "@/types";
+import { formatDate } from "@/lib/utils";
+import { dictionaries } from "@/lib/i18n";
 
-export function ArticleCard({ article }: { article: ArticleItem }) {
+export function ArticleCard({
+  article,
+  locale = "tr",
+}: {
+  article: ArticleItem;
+  locale?: Locale;
+}) {
+  const t = dictionaries[locale]?.articles ?? dictionaries.tr.articles;
+
   return (
     <article className="group flex flex-col sm:flex-row gap-5 p-5 rounded-2xl border border-slate-200 dark:border-zinc-800/90 bg-white dark:bg-zinc-900/60 hover:border-indigo-500/50 dark:hover:border-indigo-500/50 transition-all duration-200 shadow-xs hover:shadow-md">
       {article.coverImage && (
@@ -28,11 +37,11 @@ export function ArticleCard({ article }: { article: ArticleItem }) {
             </span>
             <span className="inline-flex items-center gap-1">
               <Calendar className="w-3.5 h-3.5" />
-              {formatDateTR(article.createdAt)}
+              {formatDate(article.createdAt, locale)}
             </span>
             <span className="inline-flex items-center gap-1">
               <Clock className="w-3.5 h-3.5" />
-              {article.readingTimeMinutes} dk okuma
+              {article.readingTimeMinutes} {t.minRead}
             </span>
           </div>
 
@@ -63,7 +72,7 @@ export function ArticleCard({ article }: { article: ArticleItem }) {
             href={`/articles/${article.slug}`}
             className="inline-flex items-center gap-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400 group-hover:translate-x-0.5 transition-transform"
           >
-            <span>Yazıyı Oku</span>
+            <span>{t.readMore}</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>

@@ -4,6 +4,8 @@ import "./globals.css";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { getProfile } from "@/lib/db";
+import { getDictionary, getLocale } from "@/lib/i18n";
+import { localizeProfile } from "@/lib/translator";
 
 const inter = Inter({
   subsets: ["latin", "latin-ext"],
@@ -16,11 +18,15 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export async function generateMetadata(): Promise<Metadata> {
-  const profile = await getProfile();
+  const [locale, rawProfile] = await Promise.all([getLocale(), getProfile()]);
+  const dict = getDictionary(locale);
+  const profile = await localizeProfile(rawProfile, locale);
+  const fullTitle = `${profile.siteName} — ${dict.metaDefaultSuffix}`;
+
   return {
     metadataBase: new URL("https://suleymanibis.dev"),
     title: {
-      default: `${profile.siteName} — Uygulamalar & Makaleler`,
+      default: fullTitle,
       template: `%s | ${profile.siteName}`,
     },
     description: profile.heroGreeting,
@@ -33,7 +39,7 @@ export async function generateMetadata(): Promise<Metadata> {
       apple: [{ url: "/logo-mark.png?v=2", sizes: "180x180", type: "image/png" }],
     },
     openGraph: {
-      title: `${profile.siteName} — Uygulamalar & Makaleler`,
+      title: fullTitle,
       description: profile.heroGreeting,
       url: "https://suleymanibis.dev",
       siteName: profile.siteName,
@@ -45,12 +51,12 @@ export async function generateMetadata(): Promise<Metadata> {
           alt: profile.siteName,
         },
       ],
-      locale: "tr_TR",
+      locale: locale === "en" ? "en_US" : "tr_TR",
       type: "website",
     },
     twitter: {
       card: "summary",
-      title: `${profile.siteName} — Uygulamalar & Makaleler`,
+      title: fullTitle,
       description: profile.heroGreeting,
       images: ["/logo.jpg"],
     },
@@ -62,7 +68,8 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const profile = await getProfile();
+  const [locale, rawProfile] = await Promise.all([getLocale(), getProfile()]);
+  const profile = await localizeProfile(rawProfile, locale);
 
   const themeInitScript = `
     (function() {
@@ -80,16 +87,16 @@ export default async function RootLayout({
   `;
 
   return (
-    <html lang="tr" className="dark" suppressHydrationWarning>
+    <html lang={locale} className="dark" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
       <body
         className={`${inter.variable} ${jetbrainsMono.variable} font-sans min-h-screen flex flex-col bg-dev-grid`}
       >
-        <Navbar siteName={profile.siteName} />
+        <Navbar siteName={profile.siteName} locale={locale} />
         <main className="flex-1">{children}</main>
-        <Footer profile={profile} />
+        <Footer profile={profile} locale={locale} />
       </body>
     </html>
   );

@@ -2,9 +2,18 @@
 
 import { useState } from "react";
 import { Check, Share2 } from "lucide-react";
+import type { Locale } from "@/types";
+import { dictionaries } from "@/lib/i18n";
 
-export function ShareButton({ title }: { title: string }) {
+export function ShareButton({
+  title,
+  locale = "tr",
+}: {
+  title: string;
+  locale?: Locale;
+}) {
   const [copied, setCopied] = useState(false);
+  const t = dictionaries[locale]?.articles ?? dictionaries.tr.articles;
 
   const handleShare = async () => {
     const url = window.location.href;
@@ -30,12 +39,12 @@ export function ShareButton({ title }: { title: string }) {
       {copied ? (
         <>
           <Check className="w-3.5 h-3.5 text-emerald-500" />
-          <span>Bağlantı Kopyalandı</span>
+          <span>{t.copiedLink}</span>
         </>
       ) : (
         <>
           <Share2 className="w-3.5 h-3.5" />
-          <span>Paylaş</span>
+          <span>{t.share}</span>
         </>
       )}
     </button>

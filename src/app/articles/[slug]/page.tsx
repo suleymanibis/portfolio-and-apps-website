@@ -4,7 +4,9 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, Calendar, Clock } from "lucide-react";
 import { getArticleBySlug, getProfile } from "@/lib/db";
 import { isAuthenticated } from "@/lib/auth";
-import { formatDateTR } from "@/lib/utils";
+import { getDictionary, getLocale } from "@/lib/i18n";
+import { localizeArticle, localizeProfile } from "@/lib/translator";
+import { formatDate } from "@/lib/utils";
 import { MarkdownRenderer } from "@/components/MarkdownRenderer";
 import { ShareButton } from "@/components/ShareButton";
 
@@ -14,9 +16,11 @@ export async function generateMetadata(context: {
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await context.params;
-  const admin = await isAuthenticated();
-  const article = await getArticleBySlug(slug, admin);
-  if (!article) return { title: "Makale Bulunamadı" };
+  const [locale, admin] = await Promise.all([getLocale(), isAuthenticated()]);
+  const dict = getDictionary(locale);
+  const rawArticle = await getArticleBySlug(slug, admin);
+  if (!rawArticle) return { title: dict.articles.notFoundTitle };
+  const article = await localizeArticle(rawArticle, locale);
   return {
     title: article.title,
     description: article.excerpt,
@@ -27,12 +31,22 @@ export default async function ArticleDetailPage(context: {
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await context.params;
-  const [admin, profile] = await Promise.all([isAuthenticated(), getProfile()]);
-  const article = await getArticleBySlug(slug, admin);
+  const [locale, admin, rawProfile] = await Promise.all([
+    getLocale(),
+    isAuthenticated(),
+    getProfile(),
+  ]);
+  const rawArticle = await getArticleBySlug(slug, admin);
 
-  if (!article) {
+  if (!rawArticle) {
     notFound();
   }
+
+  const dict = getDictionary(locale);
+  const [article, profile] = await Promise.all([
+    localizeArticle(rawArticle, locale),
+    localizeProfile(rawProfile, locale),
+  ]);
 
   return (
     <article className="max-w-3xl mx-auto px-4 sm:px-6 py-12 space-y-8">
@@ -42,9 +56,9 @@ export default async function ArticleDetailPage(context: {
           className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>Tüm Makaleler</span>
+          <span>{dict.articles.backToAll}</span>
         </Link>
-        <ShareButton title={article.title} />
+        <ShareButton title={article.title} locale={locale} />
       </div>
 
       {/* Article Header */}
@@ -55,16 +69,16 @@ export default async function ArticleDetailPage(context: {
           </span>
           {!article.published && (
             <span className="px-2.5 py-1 rounded-full font-semibold bg-amber-500/15 text-amber-600 dark:text-amber-400">
-              Taslak Önizleme
+              {dict.articles.draftPreview}
             </span>
           )}
           <span className="inline-flex items-center gap-1">
             <Calendar className="w-3.5 h-3.5" />
-            {formatDateTR(article.createdAt)}
+            {formatDate(article.createdAt, locale)}
           </span>
           <span className="inline-flex items-center gap-1">
             <Clock className="w-3.5 h-3.5" />
-            {article.readingTimeMinutes} dk okuma
+            {article.readingTimeMinutes} {dict.articles.minRead}
           </span>
         </div>
 
@@ -103,14 +117,14 @@ export default async function ArticleDetailPage(context: {
 
       {/* Markdown Body */}
       <div className="rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/50 p-6 sm:p-10 shadow-xs">
-        <MarkdownRenderer content={article.content} />
+        <MarkdownRenderer content={article.content} locale={locale} />
       </div>
 
       {/* Author Box */}
       <div className="rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/60 p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <p className="text-xs font-mono uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-            Yazar
+            {dict.articles.authorLabel}
           </p>
           <p className="font-bold text-slate-900 dark:text-white mt-0.5">
             {profile.ownerName}
@@ -123,7 +137,7 @@ export default async function ArticleDetailPage(context: {
           href="/apps"
           className="inline-flex items-center justify-center px-4 py-2 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white transition-colors shrink-0"
         >
-          Geliştirdiğim Uygulamaları Gör
+          {dict.articles.authorCta}
         </Link>
       </div>
     </article>

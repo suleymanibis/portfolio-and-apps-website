@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
-import { deleteApp, updateApp } from "@/lib/db";
+import { deleteApp, getApps, updateApp } from "@/lib/db";
 import { isAuthenticated } from "@/lib/auth";
 import { slugify } from "@/lib/utils";
+import { buildAppEnTranslation } from "@/lib/translator";
 import {
   checkMutationRateLimit,
   cleanStringArray,
@@ -45,6 +46,11 @@ export async function PUT(
   if (!parsedBody.ok) return parsedBody.response;
 
   try {
+    const existing = (await getApps()).find((a) => a.id === id);
+    if (!existing) {
+      return NextResponse.json({ error: "Uygulama bulunamadı." }, { status: 404 });
+    }
+
     const body = parsedBody.data;
     const sanitizedUpdates: Partial<AppItem> = {};
     if (body.title !== undefined)
@@ -79,6 +85,13 @@ export async function PUT(
       sanitizedUpdates.status = body.status as AppStatus;
     if (body.featured !== undefined)
       sanitizedUpdates.featured = Boolean(body.featured);
+
+    sanitizedUpdates.en = await buildAppEnTranslation({
+      title: sanitizedUpdates.title ?? existing.title,
+      tagline: sanitizedUpdates.tagline ?? existing.tagline,
+      description: sanitizedUpdates.description ?? existing.description,
+      category: sanitizedUpdates.category ?? existing.category,
+    });
 
     const updated = await updateApp(id, sanitizedUpdates);
     if (!updated) {

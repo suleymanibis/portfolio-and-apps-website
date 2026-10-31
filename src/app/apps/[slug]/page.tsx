@@ -10,7 +10,9 @@ import {
   Tag,
 } from "lucide-react";
 import { getAppBySlug } from "@/lib/db";
-import { formatDateTR, statusLabels } from "@/lib/utils";
+import { getDictionary, getLocale } from "@/lib/i18n";
+import { localizeApp } from "@/lib/translator";
+import { formatDate, getStatusInfo } from "@/lib/utils";
 import { MarkdownRenderer } from "@/components/MarkdownRenderer";
 
 export const dynamic = "force-dynamic";
@@ -19,8 +21,10 @@ export async function generateMetadata(context: {
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await context.params;
-  const app = await getAppBySlug(slug);
-  if (!app) return { title: "Uygulama Bulunamadı" };
+  const [locale, rawApp] = await Promise.all([getLocale(), getAppBySlug(slug)]);
+  const dict = getDictionary(locale);
+  if (!rawApp) return { title: dict.apps.notFoundTitle };
+  const app = await localizeApp(rawApp, locale);
   return {
     title: app.title,
     description: app.tagline,
@@ -31,13 +35,15 @@ export default async function AppDetailPage(context: {
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await context.params;
-  const app = await getAppBySlug(slug);
+  const [locale, rawApp] = await Promise.all([getLocale(), getAppBySlug(slug)]);
 
-  if (!app) {
+  if (!rawApp) {
     notFound();
   }
 
-  const statusInfo = statusLabels[app.status] || statusLabels.live;
+  const dict = getDictionary(locale);
+  const app = await localizeApp(rawApp, locale);
+  const statusInfo = getStatusInfo(app.status, locale);
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12 space-y-8">
@@ -46,7 +52,7 @@ export default async function AppDetailPage(context: {
         className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
       >
         <ArrowLeft className="w-4 h-4" />
-        <span>Tüm Uygulamalara Dön</span>
+        <span>{dict.apps.backToAll}</span>
       </Link>
 
       {/* Header Card */}
@@ -67,7 +73,7 @@ export default async function AppDetailPage(context: {
           )}
           <span className="inline-flex items-center gap-1 text-xs text-slate-500 dark:text-zinc-400 ml-auto">
             <Calendar className="w-3.5 h-3.5" />
-            {formatDateTR(app.createdAt)}
+            {formatDate(app.createdAt, locale)}
           </span>
         </div>
 
@@ -90,7 +96,7 @@ export default async function AppDetailPage(context: {
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm bg-indigo-600 hover:bg-indigo-500 text-white shadow-sm transition-colors"
             >
               <ExternalLink className="w-4 h-4" />
-              <span>Canlı Uygulamayı Aç</span>
+              <span>{dict.apps.openLive}</span>
             </a>
           )}
           {app.downloadUrl && (
@@ -101,7 +107,7 @@ export default async function AppDetailPage(context: {
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm transition-colors"
             >
               <Download className="w-4 h-4" />
-              <span>İndir</span>
+              <span>{dict.apps.download}</span>
             </a>
           )}
           {app.repoUrl && (
@@ -112,7 +118,7 @@ export default async function AppDetailPage(context: {
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 hover:border-indigo-500/50 text-slate-800 dark:text-zinc-200 transition-colors"
             >
               <Github className="w-4 h-4" />
-              <span>Kaynak Kod (GitHub)</span>
+              <span>{dict.apps.sourceCode}</span>
             </a>
           )}
         </div>
@@ -134,7 +140,7 @@ export default async function AppDetailPage(context: {
           <div className="pt-4 border-t border-slate-100 dark:border-zinc-800 flex flex-wrap items-center gap-2">
             <span className="inline-flex items-center gap-1 text-xs font-semibold text-slate-500 dark:text-zinc-400 mr-1">
               <Tag className="w-3.5 h-3.5" />
-              Teknolojiler:
+              {dict.apps.techStack}
             </span>
             {app.techStack.map((tech) => (
               <span
@@ -151,7 +157,7 @@ export default async function AppDetailPage(context: {
       {/* Markdown Description */}
       {app.description && (
         <div className="rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/50 p-6 sm:p-10 shadow-xs">
-          <MarkdownRenderer content={app.description} />
+          <MarkdownRenderer content={app.description} locale={locale} />
         </div>
       )}
     </div>

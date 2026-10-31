@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 import { createApp, getApps } from "@/lib/db";
 import { isAuthenticated } from "@/lib/auth";
 import { slugify } from "@/lib/utils";
+import { buildAppEnTranslation } from "@/lib/translator";
 import {
   checkMutationRateLimit,
   cleanStringArray,
@@ -56,14 +57,23 @@ export async function POST(request: Request) {
     const status: AppStatus = ALLOWED_STATUSES.includes(body.status as AppStatus)
       ? (body.status as AppStatus)
       : "live";
+    const description = cleanText(body.description, 50000);
+    const category = cleanText(body.category, 60) || "Genel";
+
+    const en = await buildAppEnTranslation({
+      title,
+      tagline,
+      description,
+      category,
+    });
 
     const created = await createApp({
       title,
       slug: slug || `app-${Date.now()}`,
       tagline,
-      description: cleanText(body.description, 50000),
+      description,
       coverImage: sanitizeImageUrl(body.coverImage),
-      category: cleanText(body.category, 60) || "Genel",
+      category,
       techStack: cleanStringArray(body.techStack, 20, 40),
       demoUrl: sanitizeHttpUrl(body.demoUrl),
       repoUrl: sanitizeHttpUrl(body.repoUrl),
@@ -71,6 +81,7 @@ export async function POST(request: Request) {
       version: cleanText(body.version, 32),
       status,
       featured: Boolean(body.featured),
+      en,
     });
 
     revalidatePath("/");
