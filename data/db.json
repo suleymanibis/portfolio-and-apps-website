@@ -11,7 +11,16 @@
     "twitterUrl": "",
     "linkedinUrl": "",
     "email": "suleymanibis1091@gmail.com",
-    "avatarUrl": ""
+    "avatarUrl": "",
+    "instagramUrl": "https://instagram.com/suleymanibis1",
+    "micupUrl": "",
+    "discordUrl": "",
+    "en": {
+      "roleTitle": "Software Developer & Computer Engineering Student",
+      "heroGreeting": "My digital workspace where I share the applications and technical articles I have developed.",
+      "bio": "I produce projects on backend systems, modern web applications and developer tools. Here you can review the software I have published and read the articles I have written about software engineering processes.",
+      "location": "Türkiye"
+    }
   },
   "apps": [],
   "articles": []
