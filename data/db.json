@@ -6,7 +6,7 @@
     "heroGreeting": "Geliştirdiğim uygulamaları ve teknik makalelerimi paylaştığım dijital çalışma alanım.",
     "bio": "Backend sistemleri, modern web uygulamaları ve geliştirici araçları üzerine projeler üretiyorum. Burada yayına aldığım yazılımları inceleyebilir ve yazılım mühendisliği süreçlerine dair yazdığım makaleleri okuyabilirsiniz.",
     "location": "Türkiye",
-    "availableForWork": false,
+    "availableForWork": true,
     "githubUrl": "https://github.com/suleymanibis",
     "twitterUrl": "",
     "linkedinUrl": "",
