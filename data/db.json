@@ -15,27 +15,6 @@
   },
   "apps": [
     {
-      "id": "app-1",
-      "title": "FocusFlow Pomodoro & Görev Yöneticisi",
-      "slug": "focusflow-pomodoro-gorev-yoneticisi",
-      "tagline": "Derin çalışma seanslarınızı takip eden minimalist masaüstü ve web üretkenlik aracı.",
-      "description": "## Proje Hakkında\n\n**FocusFlow**, dikkat dağıtıcı unsurları en aza indirerek günlük görevlerinizi Pomodoro tekniğiyle birleştiren modern bir üretkenlik uygulamasıdır.\n\n### Öne Çıkan Özellikler\n- **Akıllı Zamanlayıcı:** Özelleştirilebilir çalışma ve mola periyotları.\n- **Klavye Kısayolları:** Fareye dokunmadan görev ekleme ve zamanlayıcı başlatma.\n- **Haftalık İstatistikler:** Hangi projeye ne kadar vakit ayırdığınızı gösteren grafikler.\n- **Çevrimdışı Çalışma:** Yerel depolama desteği ile internet olmadan da kesintisiz kullanım.",
-      "category": "Üretkenlik",
-      "techStack": [
-        "Next.js",
-        "TypeScript",
-        "Tailwind CSS",
-        "IndexedDB"
-      ],
-      "demoUrl": "https://suleymanibis.dev",
-      "repoUrl": "https://github.com/suleymanibis",
-      "version": "v1.4.0",
-      "status": "live",
-      "featured": true,
-      "createdAt": "2026-09-15T10:00:00.000Z",
-      "updatedAt": "2026-10-20T14:30:00.000Z"
-    },
-    {
       "id": "app-2",
       "title": "Commerce Cart Backend & İstemci Araçları",
       "slug": "commerce-cart-backend-ve-istemci-araclari",
