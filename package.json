@@ -7,7 +7,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "node --no-warnings --import ./tests/register-alias.mjs --test tests/*.test.mts"
+    "typecheck": "tsc --noEmit",
+    "check:db": "node tests/check-db.mjs",
+    "test": "node --no-warnings --import ./tests/register-alias.mjs --test tests/*.test.mts",
+    "test:smoke": "node tests/smoke-e2e.mjs",
+    "ci": "npm run check:db && npm run typecheck && npm test && npm run build && npm run test:smoke"
   },
   "overrides": {
     "postcss": "^8.5.32"

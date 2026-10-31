@@ -1,0 +1,144 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - "feat/**"
+      - "fix/**"
+      - "refactor/**"
+    paths-ignore:
+      - "data/**"
+      - "public/uploads/**"
+      - "**.md"
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "24"
+  NEXT_TELEMETRY_DISABLED: "1"
+
+jobs:
+  quality-and-security:
+    name: Static Analysis, Security Audit & Unit Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      - name: Install dependencies deterministically
+        run: npm ci
+
+      - name: Audit production dependencies for high/critical CVEs
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Validate data/db.json integrity
+        run: npm run check:db
+
+      - name: Run strict TypeScript type-checking
+        run: npm run typecheck
+
+      - name: Run security, domain, i18n & SEO unit tests
+        run: npm test
+
+  build-and-smoke:
+    name: Production Build & E2E Smoke Verification
+    needs: quality-and-security
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      - name: Cache Next.js build cache
+        uses: actions/cache@v4
+        with:
+          path: .next/cache
+          key: nextjs-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{ hashFiles('src/**') }}
+          restore-keys: |
+            nextjs-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-
+            nextjs-${{ runner.os }}-
+
+      - name: Install dependencies deterministically
+        run: npm ci
+
+      - name: Build optimized Next.js production bundle
+        env:
+          AUTH_SECRET: "ci-ephemeral-auth-secret-32-chars-minimum-check"
+          ADMIN_PASSWORD_HASH: "scrypt:00112233445566778899aabbccddeeff:00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff"
+        run: npm run build
+
+      - name: Run E2E HTTP, SEO & security smoke suite
+        env:
+          AUTH_SECRET: "ci-ephemeral-auth-secret-32-chars-minimum-check"
+          ADMIN_PASSWORD_HASH: "scrypt:00112233445566778899aabbccddeeff:00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff"
+        run: npm run test:smoke
+
+  post-deploy-verification:
+    name: Production CD & Live Health Check
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: build-and-smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+    steps:
+      - name: Checkout repository (when Vercel CLI secrets are configured)
+        if: env.VERCEL_TOKEN != '' && env.VERCEL_ORG_ID != '' && env.VERCEL_PROJECT_ID != ''
+        uses: actions/checkout@v4
+
+      - name: Deploy via Vercel CLI (optional override when VERCEL_TOKEN is set)
+        if: env.VERCEL_TOKEN != '' && env.VERCEL_ORG_ID != '' && env.VERCEL_PROJECT_ID != ''
+        run: |
+          npx --yes vercel@latest pull --yes --environment=production --token="$VERCEL_TOKEN"
+          npx --yes vercel@latest build --prod --token="$VERCEL_TOKEN"
+          npx --yes vercel@latest deploy --prebuilt --prod --token="$VERCEL_TOKEN"
+
+      - name: Verify live production endpoints (suleymanibis.dev)
+        run: |
+          echo "Allowing Vercel Git deployment window to settle..."
+          sleep 15
+          for endpoint in "https://suleymanibis.dev" "https://suleymanibis.dev/en" "https://suleymanibis.dev/robots.txt" "https://suleymanibis.dev/sitemap.xml"; do
+            ok=0
+            for attempt in 1 2 3 4 5; do
+              status=$(curl -sS -o /dev/null -w "%{http_code}" --max-time 15 "$endpoint" || echo "000")
+              if [ "$status" = "200" ]; then
+                echo "✔ $endpoint responded HTTP 200"
+                ok=1
+                break
+              fi
+              echo "Attempt $attempt for $endpoint returned $status; retrying in 6s..."
+              sleep 6
+            done
+            if [ "$ok" != "1" ]; then
+              echo "✖ Live health check failed for $endpoint"
+              exit 1
+            fi
+          done

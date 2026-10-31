@@ -1,5 +1,7 @@
 # suleymanibis.dev — Bilingual Developer Portfolio, App Showcase & Technical Blog
 
+[![CI/CD Pipeline](https://github.com/suleymanibis/potfolio-and-apps-website/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/suleymanibis/potfolio-and-apps-website/actions/workflows/ci-cd.yml)
+
 A full-stack, security-hardened personal portfolio, application showcase, and technical blog platform built with **Next.js 15 (App Router)**, **React 19**, **TypeScript**, and **Tailwind CSS v4**.
 
 Live Website: **[https://suleymanibis.dev](https://suleymanibis.dev)** (English: **[https://suleymanibis.dev/en](https://suleymanibis.dev/en)**)
@@ -48,8 +50,7 @@ Live Website: **[https://suleymanibis.dev](https://suleymanibis.dev)** (English:
 | **UI & Styling** | React 19, TypeScript 5, Tailwind CSS v4, Lucide Icons |
 | **Markdown** | `react-markdown`, `remark-gfm` (raw HTML disabled for XSS safety) |
 | **Persistence** | Local atomic JSON (`data/db.json`) + GitHub Contents REST API |
-| **Testing** | Node.js native test runner (`node:test`, `node:assert/strict`) |
-| **Deployment** | Vercel |
+| **Testing & CI/CD** | Node.js native test runner, GitHub Actions, Dependabot, Vercel |
 
 ---
 
@@ -57,6 +58,9 @@ Live Website: **[https://suleymanibis.dev](https://suleymanibis.dev)** (English:
 
 ```text
 portfolio-hub/
+├── .github/
+│   ├── dependabot.yml             # Weekly npm & GitHub Actions security updates
+│   └── workflows/ci-cd.yml        # Automated CI/CD pipeline (audit, tests, build, E2E smoke & live check)
 ├── data/
 │   └── db.json                    # Content store (profile, about, apps, articles)
 ├── public/                        # Brand assets, favicons, and local image uploads
@@ -91,8 +95,11 @@ portfolio-hub/
 │   ├── middleware.ts              # /en subpath routing, Content-Language & X-Robots-Tag headers
 │   └── types/index.ts             # Shared TypeScript interfaces
 └── tests/
+    ├── check-db.mjs               # Validates data/db.json schema & JSON syntax
+    ├── domain-and-seo.test.mts    # Validators, GitHub parser, DB normalizer & JSON-LD schema tests
+    ├── register-alias.mjs         # Node test loader resolving @/* TypeScript imports
     ├── security.test.mts          # Security, auth, CSRF, image magic-byte & i18n tests
-    └── domain-and-seo.test.mts    # Validators, GitHub parser, DB normalizer & JSON-LD schema tests
+    └── smoke-e2e.mjs              # Live production HTTP, SEO & security smoke suite
 ```
 
 ---
@@ -140,19 +147,30 @@ npm run dev
 
 ---
 
-## Testing & Production Build
+## Testing & CI/CD Pipeline
 
-Run the automated security, domain validation, i18n, and SEO test suite:
-
-```bash
-npm test
-```
-
-Verify full TypeScript compilation, ESLint checks, and production bundle generation:
+Run the full local CI verification pipeline (DB check, strict TypeScript typecheck, 15 unit tests, production build, and live E2E HTTP smoke suite) with a single command:
 
 ```bash
-npm run build
+npm run ci
 ```
+
+Individual commands:
+
+```bash
+npm run check:db     # Validate data/db.json integrity
+npm run typecheck    # Run tsc --noEmit
+npm test             # Run unit tests (security, domain, i18n, SEO)
+npm run build        # Build production Next.js bundle
+npm run test:smoke   # Boot production server & run E2E HTTP/CSRF/SEO checks
+```
+
+### GitHub Actions + Vercel Workflow (`.github/workflows/ci-cd.yml`)
+
+1. **`quality-and-security`:** Runs `npm ci`, `npm audit --omit=dev --audit-level=high`, `npm run check:db`, `npm run typecheck`, and `npm test`.
+2. **`build-and-smoke`:** Caches `.next/cache`, builds the production Next.js bundle, boots `next start`, and runs the automated E2E smoke test across 15 routes, SEO metadata, and CSRF/auth guards.
+3. **`post-deploy-verification` (`main` pushes):** Supports optional Vercel CLI deployment (if `VERCEL_TOKEN`, `VERCEL_ORG_ID`, and `VERCEL_PROJECT_ID` secrets are configured) alongside Vercel's native GitHub integration, then verifies live HTTP `200` health on `https://suleymanibis.dev`, `/en`, `/robots.txt`, and `/sitemap.xml`.
+4. **Content-Commit Aware:** Commits that only touch `data/**`, `public/uploads/**`, or `*.md` (such as publishing articles from `/admin`) skip redundant CI runs to conserve GitHub Actions minutes while still triggering instant Vercel updates.
 
 ---
 
