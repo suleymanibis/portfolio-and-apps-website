@@ -1,6 +1,9 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import type { Locale, SiteProfile } from "@/types";
-import { getDictionary } from "@/lib/i18n";
+import { getDictionary, resolveClientLocale } from "@/lib/i18n";
 import { SocialLinks } from "./SocialLinks";
 
 export function Footer({
@@ -10,7 +13,9 @@ export function Footer({
   profile: SiteProfile;
   locale?: Locale;
 }) {
-  const dict = getDictionary(locale);
+  const pathname = usePathname() || "/";
+  const effectiveLocale = resolveClientLocale(pathname, locale);
+  const dict = getDictionary(effectiveLocale);
 
   return (
     <footer className="border-t border-slate-200 dark:border-zinc-800/80 bg-white/60 dark:bg-zinc-950/60 mt-20">
@@ -35,7 +40,7 @@ export function Footer({
         </div>
 
         <div className="flex flex-wrap items-center justify-center gap-3">
-          <SocialLinks profile={profile} locale={locale} variant="footer" />
+          <SocialLinks profile={profile} locale={effectiveLocale} variant="footer" />
           <span className="h-4 w-px bg-slate-200 dark:bg-zinc-800 mx-1" />
           <Link
             href="/admin"

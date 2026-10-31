@@ -17,6 +17,16 @@ export function stripLocalePrefix(pathname: string): string {
   return pathname || "/";
 }
 
+export function resolveClientLocale(
+  pathname: string,
+  fallback: Locale = "tr"
+): Locale {
+  if (pathname.startsWith("/admin")) {
+    return fallback;
+  }
+  return pathname === "/en" || pathname.startsWith("/en/") ? "en" : "tr";
+}
+
 export async function getLocale(): Promise<Locale> {
   try {
     const { headers, cookies } = await import("next/headers");

@@ -14,7 +14,12 @@ import {
   X,
 } from "lucide-react";
 import type { Locale } from "@/types";
-import { dictionaries, localePath, stripLocalePrefix } from "@/lib/i18n";
+import {
+  dictionaries,
+  localePath,
+  resolveClientLocale,
+  stripLocalePrefix,
+} from "@/lib/i18n";
 import { ThemeToggle } from "./ThemeToggle";
 import { LanguageToggle } from "./LanguageToggle";
 
@@ -25,9 +30,10 @@ interface NavbarProps {
 
 export function Navbar({ siteName, locale = "tr" }: NavbarProps) {
   const pathname = usePathname() || "/";
+  const effectiveLocale = resolveClientLocale(pathname, locale);
   const cleanPathname = stripLocalePrefix(pathname);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const t = dictionaries[locale]?.nav ?? dictionaries.tr.nav;
+  const t = dictionaries[effectiveLocale]?.nav ?? dictionaries.tr.nav;
 
   const navLinks = [
     { baseHref: "/", label: t.home, icon: Code2 },
@@ -46,7 +52,7 @@ export function Navbar({ siteName, locale = "tr" }: NavbarProps) {
     <header className="sticky top-0 z-50 border-b border-slate-200/80 dark:border-zinc-800/80 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
         <Link
-          href={localePath("/", locale)}
+          href={localePath("/", effectiveLocale)}
           className="flex items-center gap-2.5 font-bold text-lg tracking-tight text-slate-900 dark:text-white group"
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -79,7 +85,7 @@ export function Navbar({ siteName, locale = "tr" }: NavbarProps) {
             return (
               <Link
                 key={link.baseHref}
-                href={localePath(link.baseHref, locale)}
+                href={localePath(link.baseHref, effectiveLocale)}
                 className={`px-3.5 py-2 rounded-lg text-sm font-medium transition-colors ${
                   active
                     ? "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
@@ -93,7 +99,7 @@ export function Navbar({ siteName, locale = "tr" }: NavbarProps) {
         </nav>
 
         <div className="hidden md:flex items-center gap-2">
-          <LanguageToggle locale={locale} />
+          <LanguageToggle locale={effectiveLocale} />
           <ThemeToggle />
           <Link
             href="/admin"
@@ -111,7 +117,7 @@ export function Navbar({ siteName, locale = "tr" }: NavbarProps) {
 
         {/* Mobile Controls */}
         <div className="flex md:hidden items-center gap-1.5">
-          <LanguageToggle locale={locale} />
+          <LanguageToggle locale={effectiveLocale} />
           <ThemeToggle />
           <button
             type="button"
@@ -133,7 +139,7 @@ export function Navbar({ siteName, locale = "tr" }: NavbarProps) {
             return (
               <Link
                 key={link.baseHref}
-                href={localePath(link.baseHref, locale)}
+                href={localePath(link.baseHref, effectiveLocale)}
                 onClick={() => setMobileOpen(false)}
                 className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium ${
                   active

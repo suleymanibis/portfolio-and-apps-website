@@ -305,7 +305,9 @@ test("9. About page localization returns Turkish or English content cleanly", as
 });
 
 test("10. Bilingual SEO URLs, hreflang alternates & XSS-safe JSON-LD serialization", async () => {
-  const { localePath, stripLocalePrefix } = await import("../src/lib/i18n.ts");
+  const { localePath, resolveClientLocale, stripLocalePrefix } = await import(
+    "../src/lib/i18n.ts"
+  );
   const { buildAlternates, canonicalUrlFor, serializeSafeJsonLd } =
     await import("../src/lib/seo.ts");
 
@@ -314,6 +316,13 @@ test("10. Bilingual SEO URLs, hreflang alternates & XSS-safe JSON-LD serializati
   assert.equal(localePath("/articles/spring-boot", "en"), "/en/articles/spring-boot");
   assert.equal(stripLocalePrefix("/en/articles/spring-boot"), "/articles/spring-boot");
   assert.equal(stripLocalePrefix("/en"), "/");
+
+  assert.equal(resolveClientLocale("/", "en"), "tr");
+  assert.equal(resolveClientLocale("/about", "en"), "tr");
+  assert.equal(resolveClientLocale("/en", "tr"), "en");
+  assert.equal(resolveClientLocale("/en/about", "tr"), "en");
+  assert.equal(resolveClientLocale("/admin", "en"), "en");
+  assert.equal(resolveClientLocale("/admin", "tr"), "tr");
 
   assert.equal(canonicalUrlFor("/about", "tr"), "https://suleymanibis.dev/about");
   assert.equal(canonicalUrlFor("/about", "en"), "https://suleymanibis.dev/en/about");
