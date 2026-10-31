@@ -14,5 +14,34 @@
     "avatarUrl": ""
   },
   "apps": [],
-  "articles": []
+  "articles": [
+    {
+      "title": "Bu bir deneme makalesidir.",
+      "slug": "bu-bir-deneme-makalesidir",
+      "excerpt": "Bu bir deneme makalesidir.",
+      "content": "## Bu bir deneme makalesidir.\n\n1. Bu bir deneme\n\n```java\npublic static void main(String[] args){\n    Scanner inp = new Scanner(System.in);\n    String isim = inp.nextLine();\n}\n```",
+      "coverImage": "",
+      "category": "Yazılım Geliştirme",
+      "tags": [
+        "Java",
+        "Terminal"
+      ],
+      "published": true,
+      "featured": false,
+      "readingTimeMinutes": 1,
+      "en": {
+        "title": "This is a test article.",
+        "excerpt": "This is a test article.",
+        "content": "## This is a test article.\n\n1. This is a try\n\n```java\npublic static void main(String[] args){\n    Scanner inp = new Scanner(System.in);\n    String isim = inp.nextLine();\n}\n```",
+        "category": "Software Development",
+        "tags": [
+          "java",
+          "terminal"
+        ]
+      },
+      "id": "art-1793458098428",
+      "createdAt": "2026-10-31T14:48:18.428Z",
+      "updatedAt": "2026-10-31T14:48:18.428Z"
+    }
+  ]
 }
