@@ -147,6 +147,7 @@ export function buildArticleJsonLd(
       {
         "@type": "TechArticle",
         "@id": `${url}#article`,
+        url,
         mainEntityOfPage: {
           "@type": "WebPage",
           "@id": url,

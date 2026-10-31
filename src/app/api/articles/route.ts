@@ -1,17 +1,12 @@
 import { NextResponse } from "next/server";
-import { revalidatePath } from "next/cache";
 import { createArticle, getArticles } from "@/lib/db";
 import { isAuthenticated } from "@/lib/auth";
-import { calculateReadingTime, slugify } from "@/lib/utils";
-import { buildArticleEnTranslation } from "@/lib/translator";
 import {
-  checkMutationRateLimit,
-  cleanStringArray,
-  cleanText,
-  readBoundedJson,
-  sanitizeImageUrl,
-  verifySameOrigin,
-} from "@/lib/security";
+  requireAdminJsonMutation,
+  revalidateContentPaths,
+} from "@/lib/api-guards";
+import { buildArticleEnTranslation } from "@/lib/translator";
+import { sanitizeArticleCreateInput } from "@/lib/validators";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -22,63 +17,30 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const csrfErr = verifySameOrigin(request);
-  if (csrfErr) return csrfErr;
-
-  const rateErr = checkMutationRateLimit(request);
-  if (rateErr) return rateErr;
-
-  if (!(await isAuthenticated())) {
-    return NextResponse.json({ error: "Yetkisiz erişim." }, { status: 401 });
-  }
-
-  const parsedBody = await readBoundedJson(request, 262144);
+  const parsedBody = await requireAdminJsonMutation(request, 262144);
   if (!parsedBody.ok) return parsedBody.response;
 
   try {
-    const body = parsedBody.data;
-    const title = cleanText(body.title, 180);
-    const content = cleanText(body.content, 100000);
-
-    if (!title || !content) {
-      return NextResponse.json(
-        { error: "Makale başlığı ve içeriği zorunludur." },
-        { status: 400 }
-      );
+    const validated = sanitizeArticleCreateInput(parsedBody.data);
+    if (!validated.ok) {
+      return NextResponse.json({ error: validated.error }, { status: 400 });
     }
 
-    const slug = slugify(cleanText(body.slug, 180) || title);
-    const excerpt =
-      cleanText(body.excerpt, 400) ||
-      content.replace(/[#>*_`~\-\[\]()]/g, "").slice(0, 180).trim() + "...";
-    const category = cleanText(body.category, 60) || "Genel";
-    const tags = cleanStringArray(body.tags, 20, 40);
-
+    const { value } = validated;
     const en = await buildArticleEnTranslation({
-      title,
-      excerpt,
-      content,
-      category,
-      tags,
+      title: value.title,
+      excerpt: value.excerpt,
+      content: value.content,
+      category: value.category,
+      tags: value.tags,
     });
 
     const created = await createArticle({
-      title,
-      slug: slug || `makale-${Date.now()}`,
-      excerpt,
-      content,
-      coverImage: sanitizeImageUrl(body.coverImage),
-      category,
-      tags,
-      published: body.published !== undefined ? Boolean(body.published) : true,
-      featured: Boolean(body.featured),
-      readingTimeMinutes: calculateReadingTime(content),
+      ...value,
       en,
     });
 
-    revalidatePath("/");
-    revalidatePath("/articles");
-    revalidatePath("/sitemap.xml");
+    revalidateContentPaths(["/", "/articles"]);
     return NextResponse.json(created, { status: 201 });
   } catch {
     return NextResponse.json(

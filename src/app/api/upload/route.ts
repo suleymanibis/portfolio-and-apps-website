@@ -2,25 +2,18 @@ import crypto from "crypto";
 import fs from "fs/promises";
 import path from "path";
 import { NextResponse } from "next/server";
-import { isAuthenticated } from "@/lib/auth";
+import { requireAdminMutation } from "@/lib/api-guards";
 import {
-  checkMutationRateLimit,
-  detectSafeImageExtension,
-  verifySameOrigin,
-} from "@/lib/security";
+  getGitHubStorageConfig,
+  uploadGitHubBinaryFile,
+} from "@/lib/github-storage";
+import { detectSafeImageExtension } from "@/lib/security";
 
 const MAX_UPLOAD_BYTES = 5 * 1024 * 1024; // 5 MB max
 
 export async function POST(request: Request) {
-  const csrfErr = verifySameOrigin(request);
-  if (csrfErr) return csrfErr;
-
-  const rateErr = checkMutationRateLimit(request);
-  if (rateErr) return rateErr;
-
-  if (!(await isAuthenticated())) {
-    return NextResponse.json({ error: "Yetkisiz erişim." }, { status: 401 });
-  }
+  const guardErr = await requireAdminMutation(request);
+  if (guardErr) return guardErr;
 
   try {
     const contentLength = Number(request.headers.get("content-length") || "0");
@@ -69,37 +62,22 @@ export async function POST(request: Request) {
     const fileName = `${crypto.randomUUID()}${safeExt}`;
 
     // If GitHub cloud storage is configured (e.g. on Vercel), commit image to repo
-    const ghToken = process.env.GITHUB_TOKEN?.trim();
-    const ghRepo = process.env.GITHUB_REPO?.trim();
-    const ghBranch = process.env.GITHUB_BRANCH?.trim() || "main";
-
-    if (ghToken && ghRepo && /^[\w.-]+\/[\w.-]+$/.test(ghRepo)) {
-      const ghUrl = `https://api.github.com/repos/${ghRepo}/contents/public/uploads/${fileName}`;
-      const ghRes = await fetch(ghUrl, {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${ghToken}`,
-          Accept: "application/vnd.github+json",
-          "Content-Type": "application/json",
-          "X-GitHub-Api-Version": "2022-11-28",
-        },
-        body: JSON.stringify({
-          message: `chore(uploads): add ${fileName}`,
-          content: buffer.toString("base64"),
-          branch: ghBranch,
-        }),
-      });
-
-      if (!ghRes.ok) {
+    const ghCfg = getGitHubStorageConfig();
+    if (ghCfg) {
+      try {
+        const rawUrl = await uploadGitHubBinaryFile(
+          ghCfg,
+          `public/uploads/${fileName}`,
+          buffer,
+          `chore(uploads): add ${fileName}`
+        );
+        return NextResponse.json({ url: rawUrl });
+      } catch {
         return NextResponse.json(
           { error: "Görsel bulut depoya yüklenemedi." },
           { status: 500 }
         );
       }
-
-      return NextResponse.json({
-        url: `https://raw.githubusercontent.com/${ghRepo}/${ghBranch}/public/uploads/${fileName}`,
-      });
     }
 
     // Local filesystem storage

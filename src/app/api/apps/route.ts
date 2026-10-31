@@ -1,26 +1,11 @@
 import { NextResponse } from "next/server";
-import { revalidatePath } from "next/cache";
 import { createApp, getApps } from "@/lib/db";
-import { isAuthenticated } from "@/lib/auth";
-import { slugify } from "@/lib/utils";
-import { buildAppEnTranslation } from "@/lib/translator";
 import {
-  checkMutationRateLimit,
-  cleanStringArray,
-  cleanText,
-  readBoundedJson,
-  sanitizeHttpUrl,
-  sanitizeImageUrl,
-  verifySameOrigin,
-} from "@/lib/security";
-import { AppStatus } from "@/types";
-
-const ALLOWED_STATUSES: AppStatus[] = [
-  "live",
-  "beta",
-  "in-progress",
-  "open-source",
-];
+  requireAdminJsonMutation,
+  revalidateContentPaths,
+} from "@/lib/api-guards";
+import { buildAppEnTranslation } from "@/lib/translator";
+import { sanitizeAppCreateInput } from "@/lib/validators";
 
 export async function GET() {
   const apps = await getApps();
@@ -28,65 +13,29 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const csrfErr = verifySameOrigin(request);
-  if (csrfErr) return csrfErr;
-
-  const rateErr = checkMutationRateLimit(request);
-  if (rateErr) return rateErr;
-
-  if (!(await isAuthenticated())) {
-    return NextResponse.json({ error: "Yetkisiz erişim." }, { status: 401 });
-  }
-
-  const parsedBody = await readBoundedJson(request, 262144); // 256 KB max
+  const parsedBody = await requireAdminJsonMutation(request, 262144); // 256 KB max
   if (!parsedBody.ok) return parsedBody.response;
 
   try {
-    const body = parsedBody.data;
-    const title = cleanText(body.title, 160);
-    const tagline = cleanText(body.tagline, 300);
-
-    if (!title || !tagline) {
-      return NextResponse.json(
-        { error: "Uygulama adı ve kısa açıklama zorunludur." },
-        { status: 400 }
-      );
+    const validated = sanitizeAppCreateInput(parsedBody.data);
+    if (!validated.ok) {
+      return NextResponse.json({ error: validated.error }, { status: 400 });
     }
 
-    const slug = slugify(cleanText(body.slug, 160) || title);
-    const status: AppStatus = ALLOWED_STATUSES.includes(body.status as AppStatus)
-      ? (body.status as AppStatus)
-      : "live";
-    const description = cleanText(body.description, 50000);
-    const category = cleanText(body.category, 60) || "Genel";
-
+    const { value } = validated;
     const en = await buildAppEnTranslation({
-      title,
-      tagline,
-      description,
-      category,
+      title: value.title,
+      tagline: value.tagline,
+      description: value.description,
+      category: value.category,
     });
 
     const created = await createApp({
-      title,
-      slug: slug || `app-${Date.now()}`,
-      tagline,
-      description,
-      coverImage: sanitizeImageUrl(body.coverImage),
-      category,
-      techStack: cleanStringArray(body.techStack, 20, 40),
-      demoUrl: sanitizeHttpUrl(body.demoUrl),
-      repoUrl: sanitizeHttpUrl(body.repoUrl),
-      downloadUrl: sanitizeHttpUrl(body.downloadUrl),
-      version: cleanText(body.version, 32),
-      status,
-      featured: Boolean(body.featured),
+      ...value,
       en,
     });
 
-    revalidatePath("/");
-    revalidatePath("/apps");
-    revalidatePath("/sitemap.xml");
+    revalidateContentPaths(["/", "/apps"]);
     return NextResponse.json(created, { status: 201 });
   } catch {
     return NextResponse.json(

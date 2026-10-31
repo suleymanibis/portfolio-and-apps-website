@@ -28,6 +28,22 @@ export function slugify(text: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
+/**
+ * Ensures a slug is unique among an existing list of slugs by appending -2, -3, etc.
+ */
+export function ensureUniqueSlug(
+  desiredSlug: string,
+  existingSlugs: Iterable<string>
+): string {
+  const taken = new Set(existingSlugs);
+  let candidate = desiredSlug;
+  let counter = 2;
+  while (taken.has(candidate)) {
+    candidate = `${desiredSlug}-${counter++}`;
+  }
+  return candidate;
+}
+
 export function calculateReadingTime(markdown: string): number {
   const words = markdown.trim().split(/\s+/).filter(Boolean).length;
   return Math.max(1, Math.ceil(words / 200));

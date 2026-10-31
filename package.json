@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "node --test tests/*.test.mts"
+    "test": "node --no-warnings --import ./tests/register-alias.mjs --test tests/*.test.mts"
   },
   "overrides": {
     "postcss": "^8.5.32"

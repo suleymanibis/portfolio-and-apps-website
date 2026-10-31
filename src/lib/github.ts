@@ -1,4 +1,4 @@
-import { PinnedRepoItem } from "@/types";
+import type { PinnedRepoItem } from "@/types";
 import { cleanText, sanitizeHttpUrl } from "./security";
 
 const GITHUB_USERNAME_RE =

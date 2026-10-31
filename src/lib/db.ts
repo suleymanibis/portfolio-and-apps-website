@@ -1,6 +1,6 @@
 import fs from "fs/promises";
 import path from "path";
-import {
+import type {
   AboutPageData,
   AppItem,
   ArticleItem,
@@ -12,245 +12,21 @@ import {
   sanitizeImageUrl,
   sanitizeSocialValue,
 } from "@/lib/security";
+import {
+  getGitHubStorageConfig,
+  readGitHubFile,
+  writeGitHubJsonFile,
+} from "@/lib/github-storage";
+import { defaultAboutData, initialSeedData } from "@/lib/seed-data";
+import { ensureUniqueSlug } from "@/lib/utils";
+
+export { defaultAboutData };
 
 const DATA_DIR = path.join(process.cwd(), "data");
 const DB_FILE = path.join(DATA_DIR, "db.json");
+const GITHUB_DB_PATH = "data/db.json";
 
-export const defaultAboutData: AboutPageData = {
-  headline: "Merhaba, ben Süleyman İbiş.",
-  subheadline:
-    "Akdeniz Üniversitesi Bilgisayar Mühendisliği 1. sınıf öğrencisiyim. Backend sistemleri araştırmaya, öğrenmeye ve uçtan uca çalışan yazılımlar geliştirmeye odaklanıyorum.",
-  photoUrl: "",
-  cvUrl: "",
-  currentFocus:
-    "Şu sıralar backend sistemlerinin mimarisini araştırıp öğreniyor; Java (Spring Boot & Hibernate), PostgreSQL ve bu servislerle haberleşen Python CLI ile C# (.NET) istemci uygulamaları geliştiriyorum.",
-  storyMarkdown: `## Yazılım Yolculuğum Nasıl Başladı?
-
-Bilgisayarlara ve yazılıma olan merakım ortaokul **5. sınıftaki bilgisayar dersinde** başladı. Ekranda gördüğüm programların arka planda nasıl çalıştığını kurcalama isteği, zamanla kendi araçlarımı ve projelerimi üretme tutkusuna dönüştü.
-
-Antalya'da **Akdeniz Üniversitesi**'nde **B2** seviyesinde İngilizce hazırlık eğitimimi tamamladıktan sonra şu an **Bilgisayar Mühendisliği 1. sınıf** öğrencisi olarak akademik eğitimime devam ediyorum.
-
-## Nasıl Üretiyor ve Neye Odaklanıyorum?
-
-Bir yazılımı yalnızca tek bir katmandan ibaret görmek yerine, arka uçtan istemciye kadar **uçtan uca nasıl haberleştiğini** deneyimleyerek öğrenmeyi seviyorum. Örneğin Java ile geliştirdiğim bir e-ticaret REST API servisini hem **Python** tabanlı bir komut satırı (CLI) istemcisiyle hem de **C# (.NET WinForms)** ile yazdığım masaüstü arayüzüyle entegre ederek çok katmanlı sistem pratikleri yapıyorum.
-
-Farklı disiplinleri tanımak adına zaman zaman *Unity* ve *Godot* gibi oyun motorlarıyla da kişisel denemeler yaptım; ancak asıl enerjimi ve mühendislik odağımı **backend sistemleri, API tasarımı ve veritabanı mimarisi** üzerine kurdum.`,
-  education: [
-    {
-      period: "2026 — Günümüz",
-      institution: "Akdeniz Üniversitesi",
-      title: "Bilgisayar Mühendisliği Lisans (1. Sınıf)",
-      description:
-        "Antalya'da bilgisayar bilimleri temelleri, algoritmalar ve yazılım mühendisliği üzerine lisans eğitimime devam ediyorum.",
-    },
-    {
-      period: "2025 — 2026",
-      institution: "Akdeniz Üniversitesi Yabancı Diller Yüksekokulu",
-      title: "İngilizce Hazırlık Eğitimi (B2 Seviyesi)",
-      description:
-        "Global teknik dokümantasyonları ve yazılım kaynaklarını doğrudan takip edebilecek yetkinlikte B2 seviye İngilizce hazırlık eğitimini tamamladım.",
-    },
-  ],
-  skillGroups: [
-    {
-      category: "Diller & Backend Teknolojileri",
-      items: [
-        "Java",
-        "Spring Boot",
-        "Hibernate",
-        "Python",
-        "C#",
-        ".NET (WinForms)",
-        "RESTful API",
-        "PostgreSQL",
-      ],
-    },
-    {
-      category: "IDE & Geliştirme Ortamları",
-      items: [
-        "IntelliJ IDEA",
-        "VS Code",
-        "Visual Studio",
-        "Eclipse",
-        "Atom",
-        "Git & GitHub",
-      ],
-    },
-    {
-      category: "Bulut, Dağıtım & Keşfettiklerim",
-      items: [
-        "Vercel",
-        "Render",
-        "CLI & Masaüstü İstemciler",
-        "Unity & Godot (Kişisel Denemeler)",
-      ],
-    },
-  ],
-  en: {
-    headline: "Hi there, I'm Süleyman İbiş.",
-    subheadline:
-      "First-year Computer Engineering student at Akdeniz University, focused on researching, learning, and building reliable backend systems and end-to-end software.",
-    currentFocus:
-      "Currently researching and learning backend system architectures while building practical services with Java (Spring Boot & Hibernate), PostgreSQL, and multi-client tools in Python CLI and C# (.NET).",
-    storyMarkdown: `## How My Software Journey Started
-
-My curiosity for computers and software sparked back in **5th-grade computer class**. Wanting to understand how the programs on my screen actually worked behind the scenes gradually evolved into a passion for building software of my own.
-
-After completing my **B2-level** English preparatory year at **Akdeniz University** in Antalya, I am currently pursuing my **first year in Computer Engineering**.
-
-## How I Build & What I Focus On
-
-Rather than viewing software through a single layer, I enjoy learning how systems communicate **end to end**—from database and API design all the way to client applications. For example, I built a Java e-commerce REST API and paired it with both a **Python CLI** client and a **C# (.NET WinForms)** desktop interface to practice multi-client architecture firsthand.
-
-Out of curiosity for different domains, I have also experimented locally with game engines like *Unity* and *Godot*, while dedicating my main engineering focus to **backend systems, RESTful APIs, and database architecture**.`,
-    education: [
-      {
-        period: "2026 — Present",
-        institution: "Akdeniz University",
-        title: "B.Sc. in Computer Engineering (Freshman / Year 1)",
-        description:
-          "Pursuing undergraduate studies in computer science fundamentals, algorithms, and software engineering in Antalya, Türkiye.",
-      },
-      {
-        period: "2025 — 2026",
-        institution: "Akdeniz University School of Foreign Languages",
-        title: "English Preparatory Program (B2 Level)",
-        description:
-          "Completed intensive B2-level English preparatory education, enabling fluent engagement with technical documentation and engineering literature.",
-      },
-    ],
-    skillGroups: [
-      {
-        category: "Languages & Backend Stack",
-        items: [
-          "Java",
-          "Spring Boot",
-          "Hibernate",
-          "Python",
-          "C#",
-          ".NET (WinForms)",
-          "RESTful API",
-          "PostgreSQL",
-        ],
-      },
-      {
-        category: "IDEs & Development Environments",
-        items: [
-          "IntelliJ IDEA",
-          "VS Code",
-          "Visual Studio",
-          "Eclipse",
-          "Atom",
-          "Git & GitHub",
-        ],
-      },
-      {
-        category: "Deployment & Explored Tools",
-        items: [
-          "Vercel",
-          "Render",
-          "CLI & Desktop Clients",
-          "Unity & Godot (Personal Exploration)",
-        ],
-      },
-    ],
-  },
-};
-
-const initialSeedData: DatabaseSchema = {
-  profile: {
-    siteName: "suleymanibis.dev",
-    ownerName: "Süleyman İbiş",
-    roleTitle: "Yazılım Geliştirici & Bilgisayar Mühendisliği Öğrencisi",
-    heroGreeting:
-      "Geliştirdiğim uygulamaları ve teknik makalelerimi paylaştığım dijital çalışma alanım.",
-    bio: "Backend sistemleri, modern web uygulamaları ve geliştirici araçları üzerine projeler üretiyorum. Burada yayına aldığım yazılımları inceleyebilir ve yazılım mühendisliği süreçlerine dair yazdığım makaleleri okuyabilirsiniz.",
-    location: "Antalya, Türkiye",
-    availableForWork: false,
-    githubUrl: "https://github.com/suleymanibis",
-    twitterUrl: "",
-    linkedinUrl: "",
-    instagramUrl: "",
-    micupUrl: "",
-    discordUrl: "",
-    email: "",
-  },
-  about: defaultAboutData,
-  apps: [],
-  articles: [],
-};
-
-function getGitHubStorageConfig() {
-  const token = process.env.GITHUB_TOKEN?.trim();
-  const repo = process.env.GITHUB_REPO?.trim();
-  const branch = process.env.GITHUB_BRANCH?.trim() || "main";
-  if (token && repo && /^[\w.-]+\/[\w.-]+$/.test(repo)) {
-    return { token, repo, branch };
-  }
-  return null;
-}
-
-async function readDbFromGitHub(cfg: {
-  token: string;
-  repo: string;
-  branch: string;
-}): Promise<{ data: DatabaseSchema; sha?: string } | null> {
-  const url = `https://api.github.com/repos/${cfg.repo}/contents/data/db.json?ref=${encodeURIComponent(
-    cfg.branch
-  )}`;
-  const res = await fetch(url, {
-    headers: {
-      Authorization: `Bearer ${cfg.token}`,
-      Accept: "application/vnd.github+json",
-      "X-GitHub-Api-Version": "2022-11-28",
-    },
-    cache: "no-store",
-  });
-
-  if (res.status === 404) return null;
-  if (!res.ok) {
-    throw new Error(`GitHub okuma hatası: ${res.status}`);
-  }
-
-  const json = (await res.json()) as { content: string; sha: string };
-  const decoded = Buffer.from(json.content, "base64").toString("utf-8");
-  return { data: JSON.parse(decoded) as DatabaseSchema, sha: json.sha };
-}
-
-async function writeDbToGitHub(
-  cfg: { token: string; repo: string; branch: string },
-  data: DatabaseSchema,
-  commitMessage = "chore(content): update db.json via admin panel"
-): Promise<void> {
-  const existing = await readDbFromGitHub(cfg);
-  const url = `https://api.github.com/repos/${cfg.repo}/contents/data/db.json`;
-  const contentB64 = Buffer.from(
-    JSON.stringify(data, null, 2),
-    "utf-8"
-  ).toString("base64");
-
-  const res = await fetch(url, {
-    method: "PUT",
-    headers: {
-      Authorization: `Bearer ${cfg.token}`,
-      Accept: "application/vnd.github+json",
-      "Content-Type": "application/json",
-      "X-GitHub-Api-Version": "2022-11-28",
-    },
-    body: JSON.stringify({
-      message: commitMessage,
-      content: contentB64,
-      branch: cfg.branch,
-      ...(existing?.sha ? { sha: existing.sha } : {}),
-    }),
-  });
-
-  if (!res.ok) {
-    throw new Error(`GitHub yazma hatası: ${res.status}`);
-  }
-}
-
-function normalizeDbOnRead(rawDb: DatabaseSchema): DatabaseSchema {
+export function normalizeDbOnRead(rawDb: DatabaseSchema): DatabaseSchema {
   const rawAbout = rawDb.about || structuredClone(defaultAboutData);
   return {
     profile: {
@@ -297,7 +73,7 @@ async function ensureDb(): Promise<DatabaseSchema> {
   const ghCfg = getGitHubStorageConfig();
   if (ghCfg) {
     try {
-      const remote = await readDbFromGitHub(ghCfg);
+      const remote = await readGitHubFile<DatabaseSchema>(ghCfg, GITHUB_DB_PATH);
       if (remote) return normalizeDbOnRead(remote.data);
     } catch {
       // Fallback to bundled file if GitHub temporarily unreachable on read
@@ -325,7 +101,12 @@ async function ensureDb(): Promise<DatabaseSchema> {
 async function saveDb(data: DatabaseSchema): Promise<void> {
   const ghCfg = getGitHubStorageConfig();
   if (ghCfg) {
-    await writeDbToGitHub(ghCfg, data);
+    await writeGitHubJsonFile(
+      ghCfg,
+      GITHUB_DB_PATH,
+      data,
+      "chore(content): update db.json via admin panel"
+    );
     return;
   }
 
@@ -333,6 +114,12 @@ async function saveDb(data: DatabaseSchema): Promise<void> {
   const tempFile = `${DB_FILE}.tmp`;
   await fs.writeFile(tempFile, JSON.stringify(data, null, 2), "utf-8");
   await fs.rename(tempFile, DB_FILE);
+}
+
+function sortByNewest<T extends { createdAt: string }>(items: T[]): T[] {
+  return [...items].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
 }
 
 export async function getDb(): Promise<DatabaseSchema> {
@@ -372,9 +159,7 @@ export async function updateAbout(
 
 export async function getApps(): Promise<AppItem[]> {
   const db = await ensureDb();
-  return [...db.apps].sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  );
+  return sortByNewest(db.apps);
 }
 
 export async function getAppBySlug(slug: string): Promise<AppItem | undefined> {
@@ -387,11 +172,10 @@ export async function createApp(
 ): Promise<AppItem> {
   const db = await ensureDb();
   const now = new Date().toISOString();
-  let uniqueSlug = item.slug;
-  let counter = 2;
-  while (db.apps.some((a) => a.slug === uniqueSlug)) {
-    uniqueSlug = `${item.slug}-${counter++}`;
-  }
+  const uniqueSlug = ensureUniqueSlug(
+    item.slug,
+    db.apps.map((a) => a.slug)
+  );
   const newApp: AppItem = {
     ...item,
     slug: uniqueSlug,
@@ -412,18 +196,20 @@ export async function updateApp(
   const index = db.apps.findIndex((a) => a.id === id);
   if (index === -1) return null;
 
-  if (updates.slug && updates.slug !== db.apps[index].slug) {
-    let candidate = updates.slug;
-    let counter = 2;
-    while (db.apps.some((a, i) => i !== index && a.slug === candidate)) {
-      candidate = `${updates.slug}-${counter++}`;
-    }
-    updates.slug = candidate;
+  const normalizedUpdates = { ...updates };
+  if (
+    normalizedUpdates.slug &&
+    normalizedUpdates.slug !== db.apps[index].slug
+  ) {
+    normalizedUpdates.slug = ensureUniqueSlug(
+      normalizedUpdates.slug,
+      db.apps.filter((_, i) => i !== index).map((a) => a.slug)
+    );
   }
 
   db.apps[index] = {
     ...db.apps[index],
-    ...updates,
+    ...normalizedUpdates,
     id: db.apps[index].id,
     updatedAt: new Date().toISOString(),
   };
@@ -445,9 +231,7 @@ export async function getArticles(includeDrafts = false): Promise<ArticleItem[]>
   const filtered = includeDrafts
     ? db.articles
     : db.articles.filter((a) => a.published);
-  return [...filtered].sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  );
+  return sortByNewest(filtered);
 }
 
 export async function getArticleBySlug(
@@ -465,11 +249,10 @@ export async function createArticle(
 ): Promise<ArticleItem> {
   const db = await ensureDb();
   const now = new Date().toISOString();
-  let uniqueSlug = item.slug;
-  let counter = 2;
-  while (db.articles.some((a) => a.slug === uniqueSlug)) {
-    uniqueSlug = `${item.slug}-${counter++}`;
-  }
+  const uniqueSlug = ensureUniqueSlug(
+    item.slug,
+    db.articles.map((a) => a.slug)
+  );
   const newArticle: ArticleItem = {
     ...item,
     slug: uniqueSlug,
@@ -490,18 +273,20 @@ export async function updateArticle(
   const index = db.articles.findIndex((a) => a.id === id);
   if (index === -1) return null;
 
-  if (updates.slug && updates.slug !== db.articles[index].slug) {
-    let candidate = updates.slug;
-    let counter = 2;
-    while (db.articles.some((a, i) => i !== index && a.slug === candidate)) {
-      candidate = `${updates.slug}-${counter++}`;
-    }
-    updates.slug = candidate;
+  const normalizedUpdates = { ...updates };
+  if (
+    normalizedUpdates.slug &&
+    normalizedUpdates.slug !== db.articles[index].slug
+  ) {
+    normalizedUpdates.slug = ensureUniqueSlug(
+      normalizedUpdates.slug,
+      db.articles.filter((_, i) => i !== index).map((a) => a.slug)
+    );
   }
 
   db.articles[index] = {
     ...db.articles[index],
-    ...updates,
+    ...normalizedUpdates,
     id: db.articles[index].id,
     updatedAt: new Date().toISOString(),
   };
