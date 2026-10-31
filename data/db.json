@@ -13,7 +13,34 @@
     "email": "suleymanibis1091@gmail.com",
     "avatarUrl": ""
   },
-  "apps": [],
+  "apps": [
+    {
+      "title": "Deneme Uygulaması",
+      "slug": "deneme-uygulamasi",
+      "tagline": "Deneme Uygulaması",
+      "description": "## Deneme Uygulaması\n\n1. Bu bir deneme yazısıdır.\n- Bu bir denemedir.",
+      "coverImage": "",
+      "category": "Terminal Uygulaması",
+      "techStack": [
+        "Python"
+      ],
+      "demoUrl": "",
+      "repoUrl": "",
+      "downloadUrl": "",
+      "version": "v0.1.2",
+      "status": "in-progress",
+      "featured": true,
+      "en": {
+        "title": "Trial Application",
+        "tagline": "Trial Application",
+        "description": "## Trial Application\n\n1. This is a test article.\n- This is an experiment.",
+        "category": "Terminal Application"
+      },
+      "id": "app-1793458259433",
+      "createdAt": "2026-10-31T14:50:59.433Z",
+      "updatedAt": "2026-10-31T14:50:59.433Z"
+    }
+  ],
   "articles": [
     {
       "title": "Bu bir deneme makalesidir.",
