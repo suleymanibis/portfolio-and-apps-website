@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "node --test tests/*.test.mts"
+  },
+  "overrides": {
+    "postcss": "^8.5.32"
   },
   "dependencies": {
     "lucide-react": "^0.511.0",

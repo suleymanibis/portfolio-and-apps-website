@@ -5,6 +5,7 @@ import { isAuthenticated } from "@/lib/auth";
 import {
   checkMutationRateLimit,
   cleanText,
+  readBoundedJson,
   sanitizeHttpUrl,
   sanitizeImageUrl,
   verifySameOrigin,
@@ -27,8 +28,11 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: "Yetkisiz erişim." }, { status: 401 });
   }
 
+  const parsedBody = await readBoundedJson(request, 16384); // 16 KB max
+  if (!parsedBody.ok) return parsedBody.response;
+
   try {
-    const body = await request.json();
+    const body = parsedBody.data;
     const emailRaw = cleanText(body.email, 120);
     const validEmail =
       !emailRaw || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailRaw) ? emailRaw : "";

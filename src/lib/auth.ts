@@ -1,5 +1,4 @@
 import crypto from "crypto";
-import { cookies } from "next/headers";
 
 export const AUTH_COOKIE_NAME =
   process.env.NODE_ENV === "production"
@@ -7,6 +6,7 @@ export const AUTH_COOKIE_NAME =
     : "portfolio_admin_session";
 
 const SESSION_DURATION_MS = 12 * 60 * 60 * 1000; // 12 hours
+const SCRYPT_PARAMS = { N: 16384, r: 8, p: 1 };
 
 function isProduction(): boolean {
   return process.env.NODE_ENV === "production";
@@ -23,15 +23,13 @@ export function isAuthConfiguredProperly(): {
     if (!pwd || pwd === "admin123" || pwd.length < 10) {
       return {
         valid: false,
-        reason:
-          "Canlı ortamda güvenli ADMIN_PASSWORD (en az 10 karakter) tanımlanmamış.",
+        reason: "ADMIN_PASSWORD missing or below minimum length in production",
       };
     }
     if (!secret || secret.length < 32) {
       return {
         valid: false,
-        reason:
-          "Canlı ortamda güvenli SESSION_SECRET (en az 32 karakter) tanımlanmamış.",
+        reason: "SESSION_SECRET missing or below minimum length in production",
       };
     }
   }
@@ -56,18 +54,23 @@ function getExpectedPassword(): string {
 }
 
 /**
- * Constant-time password comparison immune to timing attacks.
+ * Memory-hard (scrypt) + constant-time password verification immune to timing attacks.
  */
 export function verifyPassword(input: string): boolean {
   const config = isAuthConfiguredProperly();
   if (!config.valid) return false;
 
   const expected = getExpectedPassword();
-  if (!expected || !input) return false;
+  if (!expected || !input || input.length > 256) return false;
 
-  const inputHash = crypto.createHash("sha256").update(input).digest();
-  const expectedHash = crypto.createHash("sha256").update(expected).digest();
-  return crypto.timingSafeEqual(inputHash, expectedHash);
+  const salt = crypto
+    .createHash("sha256")
+    .update(`portfolio-auth-salt:${getSigningSecret()}`)
+    .digest();
+
+  const inputDerived = crypto.scryptSync(input, salt, 64, SCRYPT_PARAMS);
+  const expectedDerived = crypto.scryptSync(expected, salt, 64, SCRYPT_PARAMS);
+  return crypto.timingSafeEqual(inputDerived, expectedDerived);
 }
 
 /**
@@ -77,6 +80,7 @@ export function createSessionToken(): string {
   const secret = getSigningSecret();
   const now = Date.now();
   const payloadObj = {
+    v: 1,
     iat: now,
     exp: now + SESSION_DURATION_MS,
     jti: crypto.randomBytes(16).toString("hex"),
@@ -96,12 +100,14 @@ export function verifySessionToken(token: string): boolean {
   if (!config.valid) return false;
 
   const secret = getSigningSecret();
-  if (!secret || !token) return false;
+  if (!secret || !token || token.length > 1024) return false;
 
   const parts = token.split(".");
   if (parts.length !== 2) return false;
 
   const [payloadB64, providedSig] = parts;
+  if (!payloadB64 || !providedSig) return false;
+
   const expectedSig = crypto
     .createHmac("sha256", secret)
     .update(payloadB64)
@@ -116,8 +122,14 @@ export function verifySessionToken(token: string): boolean {
   try {
     const payload = JSON.parse(
       Buffer.from(payloadB64, "base64url").toString("utf-8")
-    ) as { exp?: number };
-    if (typeof payload.exp !== "number" || Date.now() >= payload.exp) {
+    ) as { exp?: number; iat?: number };
+    const now = Date.now();
+    if (
+      typeof payload.exp !== "number" ||
+      typeof payload.iat !== "number" ||
+      now >= payload.exp ||
+      payload.iat > now + 60_000
+    ) {
       return false;
     }
     return true;
@@ -127,6 +139,7 @@ export function verifySessionToken(token: string): boolean {
 }
 
 export async function isAuthenticated(): Promise<boolean> {
+  const { cookies } = await import("next/headers");
   const cookieStore = await cookies();
   const session = cookieStore.get(AUTH_COOKIE_NAME)?.value;
   if (!session) return false;

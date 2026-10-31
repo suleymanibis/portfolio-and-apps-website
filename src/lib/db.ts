@@ -1,6 +1,7 @@
 import fs from "fs/promises";
 import path from "path";
 import { AppItem, ArticleItem, DatabaseSchema, SiteProfile } from "@/types";
+import { sanitizeHttpUrl, sanitizeImageUrl } from "@/lib/security";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 const DB_FILE = path.join(DATA_DIR, "db.json");
@@ -173,12 +174,39 @@ async function writeDbToGitHub(
   }
 }
 
+function normalizeDbOnRead(rawDb: DatabaseSchema): DatabaseSchema {
+  return {
+    profile: {
+      ...rawDb.profile,
+      avatarUrl: sanitizeImageUrl(rawDb.profile?.avatarUrl),
+      githubUrl: sanitizeHttpUrl(rawDb.profile?.githubUrl),
+      twitterUrl: sanitizeHttpUrl(rawDb.profile?.twitterUrl),
+      linkedinUrl: sanitizeHttpUrl(rawDb.profile?.linkedinUrl),
+    },
+    apps: Array.isArray(rawDb.apps)
+      ? rawDb.apps.map((app) => ({
+          ...app,
+          coverImage: sanitizeImageUrl(app.coverImage),
+          demoUrl: sanitizeHttpUrl(app.demoUrl),
+          repoUrl: sanitizeHttpUrl(app.repoUrl),
+          downloadUrl: sanitizeHttpUrl(app.downloadUrl),
+        }))
+      : [],
+    articles: Array.isArray(rawDb.articles)
+      ? rawDb.articles.map((art) => ({
+          ...art,
+          coverImage: sanitizeImageUrl(art.coverImage),
+        }))
+      : [],
+  };
+}
+
 async function ensureDb(): Promise<DatabaseSchema> {
   const ghCfg = getGitHubStorageConfig();
   if (ghCfg) {
     try {
       const remote = await readDbFromGitHub(ghCfg);
-      if (remote) return remote.data;
+      if (remote) return normalizeDbOnRead(remote.data);
     } catch {
       // Fallback to bundled file if GitHub temporarily unreachable on read
     }
@@ -186,7 +214,7 @@ async function ensureDb(): Promise<DatabaseSchema> {
 
   try {
     const raw = await fs.readFile(DB_FILE, "utf-8");
-    return JSON.parse(raw) as DatabaseSchema;
+    return normalizeDbOnRead(JSON.parse(raw) as DatabaseSchema);
   } catch {
     try {
       await fs.mkdir(DATA_DIR, { recursive: true });

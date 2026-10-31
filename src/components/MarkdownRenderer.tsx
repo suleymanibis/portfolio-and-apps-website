@@ -4,6 +4,7 @@ import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Check, Copy } from "lucide-react";
+import { sanitizeImageUrl, sanitizeMarkdownHref } from "@/lib/security";
 
 function CopyCodeButton({ code }: { code: string }) {
   const [copied, setCopied] = useState(false);
@@ -78,17 +79,13 @@ export function MarkdownRenderer({ content }: { content: string }) {
             </blockquote>
           ),
           a: ({ href, children }) => {
-            const safeHref =
-              href && /^(https?:\/\/|mailto:|\/|#)/i.test(href) ? href : "#";
+            const safeHref = sanitizeMarkdownHref(href);
+            const isExternal = /^https?:\/\//i.test(safeHref);
             return (
               <a
                 href={safeHref}
-                target={safeHref.startsWith("http") ? "_blank" : undefined}
-                rel={
-                  safeHref.startsWith("http")
-                    ? "noopener noreferrer"
-                    : undefined
-                }
+                target={isExternal ? "_blank" : undefined}
+                rel={isExternal ? "noopener noreferrer" : undefined}
                 className="text-indigo-600 dark:text-indigo-400 underline underline-offset-4 hover:text-indigo-500 font-medium"
               >
                 {children}
@@ -96,11 +93,7 @@ export function MarkdownRenderer({ content }: { content: string }) {
             );
           },
           img: ({ src, alt }) => {
-            const srcStr = typeof src === "string" ? src : "";
-            const safeSrc =
-              srcStr && /^(https?:\/\/|\/uploads\/)/i.test(srcStr)
-                ? srcStr
-                : "";
+            const safeSrc = sanitizeImageUrl(typeof src === "string" ? src : "");
             if (!safeSrc) return null;
             return (
               // eslint-disable-next-line @next/next/no-img-element
@@ -108,6 +101,7 @@ export function MarkdownRenderer({ content }: { content: string }) {
                 src={safeSrc}
                 alt={alt || ""}
                 loading="lazy"
+                referrerPolicy="no-referrer"
                 className="rounded-xl border border-slate-200 dark:border-zinc-800 my-6 max-h-[480px] object-cover w-full"
               />
             );

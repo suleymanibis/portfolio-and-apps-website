@@ -7,6 +7,7 @@ import {
   checkMutationRateLimit,
   cleanStringArray,
   cleanText,
+  readBoundedJson,
   sanitizeImageUrl,
   verifySameOrigin,
 } from "@/lib/security";
@@ -30,8 +31,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Yetkisiz erişim." }, { status: 401 });
   }
 
+  const parsedBody = await readBoundedJson(request, 262144);
+  if (!parsedBody.ok) return parsedBody.response;
+
   try {
-    const body = await request.json();
+    const body = parsedBody.data;
     const title = cleanText(body.title, 180);
     const content = cleanText(body.content, 100000);
 

@@ -23,21 +23,36 @@ export async function POST(request: Request) {
   }
 
   try {
-    const formData = await request.formData();
-    const file = formData.get("file") as File | null;
-    if (!file) {
-      return NextResponse.json({ error: "Dosya seçilmedi." }, { status: 400 });
-    }
-
-    if (file.size > MAX_UPLOAD_BYTES) {
+    const contentLength = Number(request.headers.get("content-length") || "0");
+    if (contentLength > MAX_UPLOAD_BYTES + 65536) {
       return NextResponse.json(
         { error: "Dosya boyutu en fazla 5 MB olabilir." },
         { status: 413 }
       );
     }
 
+    const formData = await request.formData();
+    const file = formData.get("file") as File | null;
+    if (!file || typeof file.arrayBuffer !== "function") {
+      return NextResponse.json({ error: "Dosya seçilmedi." }, { status: 400 });
+    }
+
+    if (file.size <= 0 || file.size > MAX_UPLOAD_BYTES) {
+      return NextResponse.json(
+        { error: "Dosya boyutu 0 ile 5 MB arasında olmalıdır." },
+        { status: 413 }
+      );
+    }
+
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
+
+    if (buffer.byteLength <= 0 || buffer.byteLength > MAX_UPLOAD_BYTES) {
+      return NextResponse.json(
+        { error: "Dosya boyutu en fazla 5 MB olabilir." },
+        { status: 413 }
+      );
+    }
 
     // Verify binary magic bytes (prevents SVG XSS and MIME spoofing)
     const safeExt = detectSafeImageExtension(buffer);
@@ -82,7 +97,6 @@ export async function POST(request: Request) {
         );
       }
 
-      // Return raw GitHub CDN URL so it renders immediately without waiting for redeploy
       return NextResponse.json({
         url: `https://raw.githubusercontent.com/${ghRepo}/${ghBranch}/public/uploads/${fileName}`,
       });

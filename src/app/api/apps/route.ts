@@ -7,6 +7,7 @@ import {
   checkMutationRateLimit,
   cleanStringArray,
   cleanText,
+  readBoundedJson,
   sanitizeHttpUrl,
   sanitizeImageUrl,
   verifySameOrigin,
@@ -36,8 +37,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Yetkisiz erişim." }, { status: 401 });
   }
 
+  const parsedBody = await readBoundedJson(request, 262144); // 256 KB max
+  if (!parsedBody.ok) return parsedBody.response;
+
   try {
-    const body = await request.json();
+    const body = parsedBody.data;
     const title = cleanText(body.title, 160);
     const tagline = cleanText(body.tagline, 300);
 
@@ -49,8 +53,8 @@ export async function POST(request: Request) {
     }
 
     const slug = slugify(cleanText(body.slug, 160) || title);
-    const status: AppStatus = ALLOWED_STATUSES.includes(body.status)
-      ? body.status
+    const status: AppStatus = ALLOWED_STATUSES.includes(body.status as AppStatus)
+      ? (body.status as AppStatus)
       : "live";
 
     const created = await createApp({

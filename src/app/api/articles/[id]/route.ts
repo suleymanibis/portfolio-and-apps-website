@@ -7,6 +7,8 @@ import {
   checkMutationRateLimit,
   cleanStringArray,
   cleanText,
+  isValidEntityId,
+  readBoundedJson,
   sanitizeImageUrl,
   verifySameOrigin,
 } from "@/lib/security";
@@ -26,10 +28,16 @@ export async function PUT(
     return NextResponse.json({ error: "Yetkisiz erişim." }, { status: 401 });
   }
 
-  try {
-    const { id } = await context.params;
-    const body = await request.json();
+  const { id } = await context.params;
+  if (!isValidEntityId(id)) {
+    return NextResponse.json({ error: "Geçersiz makale kimliği." }, { status: 400 });
+  }
 
+  const parsedBody = await readBoundedJson(request, 262144);
+  if (!parsedBody.ok) return parsedBody.response;
+
+  try {
+    const body = parsedBody.data;
     const sanitizedUpdates: Partial<ArticleItem> = {};
     if (body.title !== undefined)
       sanitizedUpdates.title = cleanText(body.title, 180);
@@ -88,6 +96,10 @@ export async function DELETE(
   }
 
   const { id } = await context.params;
+  if (!isValidEntityId(id)) {
+    return NextResponse.json({ error: "Geçersiz makale kimliği." }, { status: 400 });
+  }
+
   const ok = await deleteArticle(id);
   if (!ok) {
     return NextResponse.json({ error: "Makale bulunamadı." }, { status: 404 });

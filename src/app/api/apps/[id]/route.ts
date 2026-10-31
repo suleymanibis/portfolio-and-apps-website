@@ -7,6 +7,8 @@ import {
   checkMutationRateLimit,
   cleanStringArray,
   cleanText,
+  isValidEntityId,
+  readBoundedJson,
   sanitizeHttpUrl,
   sanitizeImageUrl,
   verifySameOrigin,
@@ -34,12 +36,19 @@ export async function PUT(
     return NextResponse.json({ error: "Yetkisiz erişim." }, { status: 401 });
   }
 
-  try {
-    const { id } = await context.params;
-    const body = await request.json();
+  const { id } = await context.params;
+  if (!isValidEntityId(id)) {
+    return NextResponse.json({ error: "Geçersiz uygulama kimliği." }, { status: 400 });
+  }
 
+  const parsedBody = await readBoundedJson(request, 262144);
+  if (!parsedBody.ok) return parsedBody.response;
+
+  try {
+    const body = parsedBody.data;
     const sanitizedUpdates: Partial<AppItem> = {};
-    if (body.title !== undefined) sanitizedUpdates.title = cleanText(body.title, 160);
+    if (body.title !== undefined)
+      sanitizedUpdates.title = cleanText(body.title, 160);
     if (body.slug !== undefined) {
       sanitizedUpdates.slug = slugify(cleanText(body.slug, 160));
     } else if (sanitizedUpdates.title) {
@@ -63,8 +72,11 @@ export async function PUT(
       sanitizedUpdates.downloadUrl = sanitizeHttpUrl(body.downloadUrl);
     if (body.version !== undefined)
       sanitizedUpdates.version = cleanText(body.version, 32);
-    if (body.status !== undefined && ALLOWED_STATUSES.includes(body.status))
-      sanitizedUpdates.status = body.status;
+    if (
+      body.status !== undefined &&
+      ALLOWED_STATUSES.includes(body.status as AppStatus)
+    )
+      sanitizedUpdates.status = body.status as AppStatus;
     if (body.featured !== undefined)
       sanitizedUpdates.featured = Boolean(body.featured);
 
@@ -100,6 +112,10 @@ export async function DELETE(
   }
 
   const { id } = await context.params;
+  if (!isValidEntityId(id)) {
+    return NextResponse.json({ error: "Geçersiz uygulama kimliği." }, { status: 400 });
+  }
+
   const ok = await deleteApp(id);
   if (!ok) {
     return NextResponse.json({ error: "Uygulama bulunamadı." }, { status: 404 });

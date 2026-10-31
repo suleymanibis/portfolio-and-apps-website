@@ -30,6 +30,8 @@ const nextConfig: NextConfig = {
           { key: "X-Frame-Options", value: "DENY" },
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
+          { key: "X-Permitted-Cross-Domain-Policies", value: "none" },
           {
             key: "Permissions-Policy",
             value:
@@ -43,17 +45,44 @@ const nextConfig: NextConfig = {
         ],
       },
       {
+        // Execute uploaded static assets in a strict scriptless sandbox (prevents polyglot XSS)
+        source: "/uploads/:path*",
+        headers: [
+          {
+            key: "Content-Security-Policy",
+            value: "default-src 'none'; style-src 'unsafe-inline'; sandbox",
+          },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+        ],
+      },
+      {
+        source: "/admin",
+        headers: [
+          { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
+          {
+            key: "Cache-Control",
+            value: "private, no-store, no-cache, must-revalidate, max-age=0",
+          },
+        ],
+      },
+      {
         source: "/admin/:path*",
         headers: [
           { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
-          { key: "Cache-Control", value: "no-store, max-age=0" },
+          {
+            key: "Cache-Control",
+            value: "private, no-store, no-cache, must-revalidate, max-age=0",
+          },
         ],
       },
       {
         source: "/api/:path*",
         headers: [
           { key: "X-Robots-Tag", value: "noindex, nofollow" },
-          { key: "Cache-Control", value: "no-store, max-age=0" },
+          {
+            key: "Cache-Control",
+            value: "private, no-store, no-cache, must-revalidate, max-age=0",
+          },
         ],
       },
     ];

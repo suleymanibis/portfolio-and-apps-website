@@ -1,5 +1,3 @@
-import { NextResponse } from "next/server";
-
 interface RateRecord {
   count: number;
   resetAt: number;
@@ -9,6 +7,8 @@ interface RateRecord {
 const loginAttempts = new Map<string, RateRecord>();
 const mutationBuckets = new Map<string, RateRecord>();
 const MAX_TRACKED_IPS = 5000;
+
+let globalLoginWindow: RateRecord = { count: 0, resetAt: 0 };
 
 function cleanupMap(map: Map<string, RateRecord>, now: number) {
   if (map.size < MAX_TRACKED_IPS) return;
@@ -23,26 +23,53 @@ function cleanupMap(map: Map<string, RateRecord>, now: number) {
   }
 }
 
+/**
+ * Extracts client IP securely, prioritizing platform-verified headers (Vercel)
+ * and taking the rightmost proxy hop on X-Forwarded-For to prevent header spoofing.
+ */
 export function getClientIp(request: Request): string {
-  const xff = request.headers.get("x-forwarded-for");
-  if (xff) {
-    return xff.split(",")[0].trim().slice(0, 64);
+  const vercelIp = request.headers.get("x-vercel-forwarded-for");
+  if (vercelIp) {
+    return vercelIp.split(",")[0].trim().slice(0, 64);
   }
+
   const realIp = request.headers.get("x-real-ip");
   if (realIp) {
     return realIp.trim().slice(0, 64);
   }
+
+  const xff = request.headers.get("x-forwarded-for");
+  if (xff) {
+    const hops = xff
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    if (hops.length > 0) {
+      return hops[hops.length - 1].slice(0, 64);
+    }
+  }
+
   return "local-ip";
 }
 
 /**
- * Brute-force login rate limiter: max 5 failed attempts per 15 minutes per IP.
+ * Brute-force login rate limiter:
+ * - Max 5 failed attempts per 15 minutes per IP
+ * - Max 20 failed attempts per 5 minutes globally (distributed botnet protection)
  */
 export function checkLoginRateLimit(request: Request): {
   allowed: boolean;
   retryAfterSeconds?: number;
 } {
   const now = Date.now();
+
+  if (globalLoginWindow.lockedUntil && globalLoginWindow.lockedUntil > now) {
+    return {
+      allowed: false,
+      retryAfterSeconds: Math.ceil((globalLoginWindow.lockedUntil - now) / 1000),
+    };
+  }
+
   const ip = getClientIp(request);
   const record = loginAttempts.get(ip);
 
@@ -66,31 +93,49 @@ export function checkLoginRateLimit(request: Request): {
 export function recordFailedLogin(request: Request): void {
   const now = Date.now();
   cleanupMap(loginAttempts, now);
+
+  // Per-IP tracking (5 failures / 15 min)
   const ip = getClientIp(request);
-  const windowMs = 15 * 60 * 1000; // 15 minutes
+  const windowMs = 15 * 60 * 1000;
   const maxAttempts = 5;
 
   const existing = loginAttempts.get(ip);
   if (!existing || existing.resetAt <= now) {
     loginAttempts.set(ip, { count: 1, resetAt: now + windowMs });
-    return;
+  } else {
+    existing.count += 1;
+    if (existing.count >= maxAttempts) {
+      existing.lockedUntil = now + windowMs;
+    }
+    loginAttempts.set(ip, existing);
   }
 
-  existing.count += 1;
-  if (existing.count >= maxAttempts) {
-    existing.lockedUntil = now + windowMs;
+  // Global circuit breaker (20 failures / 5 min across all IPs)
+  const globalWindowMs = 5 * 60 * 1000;
+  if (globalLoginWindow.resetAt <= now) {
+    globalLoginWindow = { count: 1, resetAt: now + globalWindowMs };
+  } else {
+    globalLoginWindow.count += 1;
+    if (globalLoginWindow.count >= 20) {
+      globalLoginWindow.lockedUntil = now + globalWindowMs;
+    }
   }
-  loginAttempts.set(ip, existing);
 }
 
 export function clearLoginAttempts(request: Request): void {
   loginAttempts.delete(getClientIp(request));
 }
 
+export function resetRateLimitStateForTests(): void {
+  loginAttempts.clear();
+  mutationBuckets.clear();
+  globalLoginWindow = { count: 0, resetAt: 0 };
+}
+
 /**
  * General API write rate limiter: max 30 write requests per minute per IP.
  */
-export function checkMutationRateLimit(request: Request): NextResponse | null {
+export function checkMutationRateLimit(request: Request): Response | null {
   const now = Date.now();
   cleanupMap(mutationBuckets, now);
   const ip = getClientIp(request);
@@ -106,7 +151,7 @@ export function checkMutationRateLimit(request: Request): NextResponse | null {
   record.count += 1;
   if (record.count > maxRequests) {
     const retryAfter = Math.ceil((record.resetAt - now) / 1000);
-    return NextResponse.json(
+    return Response.json(
       { error: "Çok fazla istek gönderildi. Lütfen biraz bekleyin." },
       {
         status: 429,
@@ -118,39 +163,143 @@ export function checkMutationRateLimit(request: Request): NextResponse | null {
 }
 
 /**
- * CSRF protection: ensures mutating requests originate from the same host.
+ * Multi-layer CSRF protection:
+ * 1. Validates Fetch Metadata (`Sec-Fetch-Site`) when sent by modern browsers.
+ * 2. Requires either `Origin` or `Referer` to be present and strictly match `Host`.
  */
-export function verifySameOrigin(request: Request): NextResponse | null {
-  const origin = request.headers.get("origin");
+export function verifySameOrigin(request: Request): Response | null {
   const rawHost =
     request.headers.get("x-forwarded-host") || request.headers.get("host");
-  const host = rawHost ? rawHost.split(",")[0].trim() : "";
+  const host = rawHost ? rawHost.split(",")[0].trim().toLowerCase() : "";
 
   if (!host) {
-    return NextResponse.json(
+    return Response.json(
       { error: "Geçersiz istek başlığı (Host eksik)." },
       { status: 403 }
     );
   }
 
+  const secFetchSite = request.headers.get("sec-fetch-site");
+  if (
+    secFetchSite &&
+    secFetchSite !== "same-origin" &&
+    secFetchSite !== "none"
+  ) {
+    return Response.json(
+      { error: "CSRF doğrulaması başarısız (Cross-Site istek engellendi)." },
+      { status: 403 }
+    );
+  }
+
+  const origin = request.headers.get("origin");
   if (origin) {
     try {
-      const originHost = new URL(origin).host;
+      const originHost = new URL(origin).host.toLowerCase();
       if (originHost !== host) {
-        return NextResponse.json(
+        return Response.json(
           { error: "CSRF doğrulaması başarısız (Origin uyuşmuyor)." },
           { status: 403 }
         );
       }
+      return null;
     } catch {
-      return NextResponse.json(
+      return Response.json(
         { error: "Geçersiz Origin başlığı." },
         { status: 403 }
       );
     }
   }
 
-  return null;
+  const referer = request.headers.get("referer");
+  if (referer) {
+    try {
+      const refererHost = new URL(referer).host.toLowerCase();
+      if (refererHost !== host) {
+        return Response.json(
+          { error: "CSRF doğrulaması başarısız (Referer uyuşmuyor)." },
+          { status: 403 }
+        );
+      }
+      return null;
+    } catch {
+      return Response.json(
+        { error: "Geçersiz Referer başlığı." },
+        { status: 403 }
+      );
+    }
+  }
+
+  // Neither Origin nor Referer present on a mutating request -> reject
+  return Response.json(
+    { error: "CSRF doğrulaması başarısız (Kaynak başlığı eksik)." },
+    { status: 403 }
+  );
+}
+
+/**
+ * Safely reads and parses JSON with a strict byte limit and Prototype Pollution stripping.
+ */
+export async function readBoundedJson(
+  request: Request,
+  maxBytes = 262144 // 256 KB default
+): Promise<
+  | { ok: true; data: Record<string, unknown> }
+  | { ok: false; response: Response }
+> {
+  const contentLength = Number(request.headers.get("content-length") || "0");
+  if (contentLength > maxBytes) {
+    return {
+      ok: false,
+      response: Response.json(
+        { error: "İstek gövdesi izin verilen boyutu aşıyor." },
+        { status: 413 }
+      ),
+    };
+  }
+
+  try {
+    const rawText = await request.text();
+    if (Buffer.byteLength(rawText, "utf-8") > maxBytes) {
+      return {
+        ok: false,
+        response: Response.json(
+          { error: "İstek gövdesi izin verilen boyutu aşıyor." },
+          { status: 413 }
+        ),
+      };
+    }
+
+    const parsed = JSON.parse(rawText, (key, value) => {
+      if (key === "__proto__" || key === "constructor" || key === "prototype") {
+        return undefined;
+      }
+      return value;
+    });
+
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+      return {
+        ok: false,
+        response: Response.json(
+          { error: "Geçersiz JSON nesnesi." },
+          { status: 400 }
+        ),
+      };
+    }
+
+    return { ok: true, data: parsed as Record<string, unknown> };
+  } catch {
+    return {
+      ok: false,
+      response: Response.json(
+        { error: "Geçersiz JSON formatı." },
+        { status: 400 }
+      ),
+    };
+  }
+}
+
+export function isValidEntityId(id: string): boolean {
+  return /^[a-zA-Z0-9_-]{1,64}$/.test(id);
 }
 
 export function cleanText(value: unknown, maxLength: number): string {
@@ -188,6 +337,40 @@ export function sanitizeHttpUrl(value: unknown): string {
 }
 
 /**
+ * Sanitizes links inside Markdown content.
+ * Blocks protocol-relative URLs (//evil.com, /\evil.com) and dangerous schemes.
+ */
+export function sanitizeMarkdownHref(href: string | undefined): string {
+  if (!href) return "#";
+  const trimmed = href.replace(/[\u0000-\u001F\u007F\s]+/g, "").trim();
+  if (!trimmed) return "#";
+
+  // Allow anchor links
+  if (trimmed.startsWith("#")) {
+    return trimmed.slice(0, 200);
+  }
+
+  // Allow strictly internal paths starting with single '/' (not '//' or '/\')
+  if (/^\/(?![\/\\])/.test(trimmed) && !trimmed.includes("..")) {
+    return trimmed.slice(0, 500);
+  }
+
+  try {
+    const parsed = new URL(trimmed);
+    if (
+      parsed.protocol === "https:" ||
+      parsed.protocol === "http:" ||
+      parsed.protocol === "mailto:"
+    ) {
+      return parsed.toString();
+    }
+    return "#";
+  } catch {
+    return "#";
+  }
+}
+
+/**
  * Allows safe local /uploads/<file> paths or external http(s) image URLs.
  */
 export function sanitizeImageUrl(value: unknown): string {
@@ -219,8 +402,14 @@ export function detectSafeImageExtension(buffer: Buffer): string | null {
     return ".png";
   }
 
-  // JPEG: FF D8 FF
-  if (buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff) {
+  // JPEG: FF D8 FF (fourth byte must be valid JPEG marker 0xC0..0xFE)
+  if (
+    buffer[0] === 0xff &&
+    buffer[1] === 0xd8 &&
+    buffer[2] === 0xff &&
+    buffer[3] >= 0xc0 &&
+    buffer[3] <= 0xfe
+  ) {
     return ".jpg";
   }
 

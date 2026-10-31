@@ -10,6 +10,7 @@ import {
 import {
   checkLoginRateLimit,
   clearLoginAttempts,
+  readBoundedJson,
   recordFailedLogin,
   verifySameOrigin,
 } from "@/lib/security";
@@ -25,8 +26,9 @@ export async function POST(request: Request) {
 
   const configCheck = isAuthConfiguredProperly();
   if (!configCheck.valid) {
+    console.error("[Security] Auth configuration error:", configCheck.reason);
     return NextResponse.json(
-      { error: configCheck.reason || "Sunucu güvenlik yapılandırması eksik." },
+      { error: "Yönetim paneli şu anda kullanılamıyor." },
       { status: 503 }
     );
   }
@@ -48,10 +50,13 @@ export async function POST(request: Request) {
     );
   }
 
+  const parsedBody = await readBoundedJson(request, 4096);
+  if (!parsedBody.ok) return parsedBody.response;
+
   try {
-    const body = await request.json();
+    const body = parsedBody.data;
     const password =
-      typeof body?.password === "string" ? body.password.slice(0, 256) : "";
+      typeof body.password === "string" ? body.password.slice(0, 256) : "";
 
     if (!verifyPassword(password)) {
       recordFailedLogin(request);
