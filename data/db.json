@@ -13,28 +13,6 @@
     "email": "suleymanibis1091@gmail.com",
     "avatarUrl": ""
   },
-  "apps": [
-    {
-      "id": "app-2",
-      "title": "Commerce Cart Backend & İstemci Araçları",
-      "slug": "commerce-cart-backend-ve-istemci-araclari",
-      "tagline": "E-ticaret sepet ve sipariş akışlarını simüle eden REST API ve çoklu istemci mimarisi.",
-      "description": "## Mimari Genel Bakış\n\nModern e-ticaret sistemlerindeki sepet, stok ve sipariş doğrulama süreçlerini simüle eden uçtan uca bir yazılım ailesidir.\n\n### Bileşenler\n1. **REST API Sunucusu:** Katmanlı mimari ve veritabanı bütünlüğü odaklı arka uç servisi.\n2. **Masaüstü Arayüzü (.NET WinForms):** API uç noktalarıyla etkileşim kuran görsel istemci.\n3. **Python CLI İstemcisi:** Terminal üzerinden hızlı test ve otomasyon aracı.",
-      "category": "Backend & Sistem",
-      "techStack": [
-        "Java",
-        "Spring Boot",
-        "C# .NET",
-        "Python",
-        "PostgreSQL"
-      ],
-      "repoUrl": "https://github.com/suleymanibis",
-      "version": "v2.0.0",
-      "status": "open-source",
-      "featured": true,
-      "createdAt": "2026-08-10T09:00:00.000Z",
-      "updatedAt": "2026-10-05T11:15:00.000Z"
-    }
-  ],
+  "apps": [],
   "articles": []
 }
