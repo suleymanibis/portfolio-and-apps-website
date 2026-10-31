@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowRight, Calendar, Clock } from "lucide-react";
 import type { ArticleItem, Locale } from "@/types";
 import { formatDate } from "@/lib/utils";
-import { dictionaries } from "@/lib/i18n";
+import { dictionaries, localePath } from "@/lib/i18n";
 
 export function ArticleCard({
   article,
@@ -12,12 +12,13 @@ export function ArticleCard({
   locale?: Locale;
 }) {
   const t = dictionaries[locale]?.articles ?? dictionaries.tr.articles;
+  const detailHref = localePath(`/articles/${article.slug}`, locale);
 
   return (
     <article className="group flex flex-col sm:flex-row gap-5 p-5 rounded-2xl border border-slate-200 dark:border-zinc-800/90 bg-white dark:bg-zinc-900/60 hover:border-indigo-500/50 dark:hover:border-indigo-500/50 transition-all duration-200 shadow-xs hover:shadow-md">
       {article.coverImage && (
         <Link
-          href={`/articles/${article.slug}`}
+          href={detailHref}
           className="sm:w-48 h-40 sm:h-auto shrink-0 rounded-xl overflow-hidden bg-slate-100 dark:bg-zinc-800"
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -45,7 +46,7 @@ export function ArticleCard({
             </span>
           </div>
 
-          <Link href={`/articles/${article.slug}`}>
+          <Link href={detailHref}>
             <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-zinc-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
               {article.title}
             </h3>
@@ -69,7 +70,7 @@ export function ArticleCard({
           </div>
 
           <Link
-            href={`/articles/${article.slug}`}
+            href={detailHref}
             className="inline-flex items-center gap-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400 group-hover:translate-x-0.5 transition-transform"
           >
             <span>{t.readMore}</span>

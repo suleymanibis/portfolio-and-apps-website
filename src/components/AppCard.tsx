@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowUpRight, ExternalLink, Github, Layers } from "lucide-react";
 import type { AppItem, Locale } from "@/types";
 import { getStatusInfo } from "@/lib/utils";
-import { dictionaries } from "@/lib/i18n";
+import { dictionaries, localePath } from "@/lib/i18n";
 
 export function AppCard({
   app,
@@ -13,12 +13,13 @@ export function AppCard({
 }) {
   const statusInfo = getStatusInfo(app.status, locale);
   const t = dictionaries[locale]?.apps ?? dictionaries.tr.apps;
+  const detailHref = localePath(`/apps/${app.slug}`, locale);
 
   return (
     <div className="group relative flex flex-col rounded-2xl border border-slate-200 dark:border-zinc-800/90 bg-white dark:bg-zinc-900/60 hover:border-indigo-500/50 dark:hover:border-indigo-500/50 transition-all duration-200 overflow-hidden shadow-xs hover:shadow-md">
       {/* Cover */}
       <Link
-        href={`/apps/${app.slug}`}
+        href={detailHref}
         className="block relative h-44 overflow-hidden bg-gradient-to-br from-indigo-600/20 via-violet-600/15 to-sky-500/20 dark:from-indigo-500/15 dark:via-violet-500/10 dark:to-zinc-900"
       >
         {app.coverImage ? (
@@ -57,13 +58,13 @@ export function AppCard({
       <div className="flex flex-col flex-1 p-5">
         <div className="flex items-start justify-between gap-2">
           <Link
-            href={`/apps/${app.slug}`}
+            href={detailHref}
             className="font-bold text-lg text-slate-900 dark:text-zinc-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-1"
           >
             {app.title}
           </Link>
           <Link
-            href={`/apps/${app.slug}`}
+            href={detailHref}
             aria-label={app.title}
             className="text-slate-400 group-hover:text-indigo-500 transition-colors shrink-0 mt-1"
           >
@@ -97,7 +98,7 @@ export function AppCard({
         {/* Quick links */}
         <div className="flex items-center justify-between pt-4 mt-4 border-t border-slate-100 dark:border-zinc-800/80 text-xs font-medium">
           <Link
-            href={`/apps/${app.slug}`}
+            href={detailHref}
             className="text-indigo-600 dark:text-indigo-400 hover:underline"
           >
             {t.viewDetails}

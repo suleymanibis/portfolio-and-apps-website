@@ -5,6 +5,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { getProfile } from "@/lib/db";
 import { getDictionary, getLocale } from "@/lib/i18n";
+import { SITE_URL, buildAlternates, canonicalUrlFor } from "@/lib/seo";
 import { localizeProfile } from "@/lib/translator";
 
 const inter = Inter({
@@ -24,12 +25,26 @@ export async function generateMetadata(): Promise<Metadata> {
   const fullTitle = `${profile.siteName} — ${dict.metaDefaultSuffix}`;
 
   return {
-    metadataBase: new URL("https://suleymanibis.dev"),
+    metadataBase: new URL(SITE_URL),
     title: {
       default: fullTitle,
       template: `%s | ${profile.siteName}`,
     },
     description: profile.heroGreeting,
+    authors: [{ name: profile.ownerName, url: canonicalUrlFor("/about", locale) }],
+    creator: profile.ownerName,
+    publisher: profile.ownerName,
+    alternates: buildAlternates("/", locale),
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+      },
+    },
     icons: {
       icon: [
         { url: "/logo-mark.png?v=2", type: "image/png", sizes: "256x256" },
@@ -41,7 +56,7 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       title: fullTitle,
       description: profile.heroGreeting,
-      url: "https://suleymanibis.dev",
+      url: canonicalUrlFor("/", locale),
       siteName: profile.siteName,
       images: [
         {
@@ -52,6 +67,7 @@ export async function generateMetadata(): Promise<Metadata> {
         },
       ],
       locale: locale === "en" ? "en_US" : "tr_TR",
+      alternateLocale: locale === "en" ? ["tr_TR"] : ["en_US"],
       type: "website",
     },
     twitter: {

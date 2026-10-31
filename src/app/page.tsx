@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -10,7 +11,12 @@ import {
 } from "lucide-react";
 import { getApps, getArticles, getProfile } from "@/lib/db";
 import { getPinnedRepos } from "@/lib/github";
-import { getDictionary, getLocale } from "@/lib/i18n";
+import { getDictionary, getLocale, localePath } from "@/lib/i18n";
+import {
+  buildAlternates,
+  buildWebsiteAndPersonJsonLd,
+  canonicalUrlFor,
+} from "@/lib/seo";
 import {
   localizeApps,
   localizeArticles,
@@ -21,8 +27,30 @@ import { AppCard } from "@/components/AppCard";
 import { ArticleCard } from "@/components/ArticleCard";
 import { PinnedRepoCard } from "@/components/PinnedRepoCard";
 import { SocialLinks } from "@/components/SocialLinks";
+import { JsonLd } from "@/components/JsonLd";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const [locale, rawProfile] = await Promise.all([getLocale(), getProfile()]);
+  const dict = getDictionary(locale);
+  const profile = await localizeProfile(rawProfile, locale);
+  const fullTitle = `${profile.siteName} — ${dict.metaDefaultSuffix}`;
+
+  return {
+    title: { absolute: fullTitle },
+    description: profile.bio || profile.heroGreeting,
+    alternates: buildAlternates("/", locale),
+    openGraph: {
+      title: fullTitle,
+      description: profile.bio || profile.heroGreeting,
+      url: canonicalUrlFor("/", locale),
+      locale: locale === "en" ? "en_US" : "tr_TR",
+      alternateLocale: locale === "en" ? ["tr_TR"] : ["en_US"],
+      type: "website",
+    },
+  };
+}
 
 export default async function HomePage() {
   const [locale, rawProfile] = await Promise.all([getLocale(), getProfile()]);
@@ -46,8 +74,12 @@ export default async function HomePage() {
     localizePinnedRepos(rawPinnedRepos.slice(0, 6), locale),
   ]);
 
+  const jsonLd = buildWebsiteAndPersonJsonLd(profile, locale);
+
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16 space-y-20">
+      <JsonLd data={jsonLd} />
+
       {/* Hero Section */}
       <section className="relative rounded-3xl border border-slate-200 dark:border-zinc-800/90 bg-white/80 dark:bg-zinc-900/60 backdrop-blur-sm p-8 sm:p-12 overflow-hidden shadow-xs">
         <div className="absolute -top-24 -right-24 w-72 h-72 bg-indigo-500/15 dark:bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -83,21 +115,21 @@ export default async function HomePage() {
 
           <div className="flex flex-wrap items-center gap-3 pt-2">
             <Link
-              href="/apps"
+              href={localePath("/apps", locale)}
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm bg-indigo-600 hover:bg-indigo-500 text-white shadow-sm transition-colors"
             >
               <Layers className="w-4 h-4" />
               <span>{dict.hero.exploreApps}</span>
             </Link>
             <Link
-              href="/repos"
+              href={localePath("/repos", locale)}
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:border-indigo-500/50 text-slate-800 dark:text-zinc-200 transition-colors"
             >
               <FolderGit2 className="w-4 h-4" />
               <span>{dict.hero.githubRepos}</span>
             </Link>
             <Link
-              href="/articles"
+              href={localePath("/articles", locale)}
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:border-indigo-500/50 text-slate-800 dark:text-zinc-200 transition-colors"
             >
               <FileText className="w-4 h-4" />
@@ -153,7 +185,7 @@ export default async function HomePage() {
               </h2>
             </div>
             <Link
-              href="/repos"
+              href={localePath("/repos", locale)}
               className="inline-flex items-center gap-1.5 text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:underline shrink-0"
             >
               <span>
@@ -188,7 +220,7 @@ export default async function HomePage() {
             </h2>
           </div>
           <Link
-            href="/apps"
+            href={localePath("/apps", locale)}
             className="inline-flex items-center gap-1.5 text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:underline shrink-0"
           >
             <span>
@@ -224,7 +256,7 @@ export default async function HomePage() {
             </h2>
           </div>
           <Link
-            href="/articles"
+            href={localePath("/articles", locale)}
             className="inline-flex items-center gap-1.5 text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:underline shrink-0"
           >
             <span>

@@ -101,6 +101,7 @@ export async function PUT(
     revalidatePath("/");
     revalidatePath("/apps");
     revalidatePath(`/apps/${updated.slug}`);
+    revalidatePath("/sitemap.xml");
     return NextResponse.json(updated);
   } catch {
     return NextResponse.json(

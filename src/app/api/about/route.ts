@@ -99,6 +99,7 @@ export async function PUT(request: Request) {
 
     const updated = await updateAbout(safeAbout);
     revalidatePath("/about");
+    revalidatePath("/sitemap.xml");
     return NextResponse.json(updated);
   } catch {
     return NextResponse.json(

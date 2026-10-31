@@ -303,3 +303,30 @@ test("9. About page localization returns Turkish or English content cleanly", as
   assert.equal(enOut.headline, "Hi there, I'm Süleyman İbiş.");
   assert.equal(enOut.skillGroups[0].category, "IDEs");
 });
+
+test("10. Bilingual SEO URLs, hreflang alternates & XSS-safe JSON-LD serialization", async () => {
+  const { localePath, stripLocalePrefix } = await import("../src/lib/i18n.ts");
+  const { buildAlternates, canonicalUrlFor, serializeSafeJsonLd } =
+    await import("../src/lib/seo.ts");
+
+  assert.equal(localePath("/", "tr"), "/");
+  assert.equal(localePath("/", "en"), "/en");
+  assert.equal(localePath("/articles/spring-boot", "en"), "/en/articles/spring-boot");
+  assert.equal(stripLocalePrefix("/en/articles/spring-boot"), "/articles/spring-boot");
+  assert.equal(stripLocalePrefix("/en"), "/");
+
+  assert.equal(canonicalUrlFor("/about", "tr"), "https://suleymanibis.dev/about");
+  assert.equal(canonicalUrlFor("/about", "en"), "https://suleymanibis.dev/en/about");
+
+  const alt = buildAlternates("/articles/test-slug", "en");
+  assert.equal(alt.canonical, "https://suleymanibis.dev/en/articles/test-slug");
+  assert.equal(alt.languages["tr-TR"], "https://suleymanibis.dev/articles/test-slug");
+  assert.equal(alt.languages["en-US"], "https://suleymanibis.dev/en/articles/test-slug");
+
+  // Script-breakout XSS inside JSON-LD must be neutralized
+  const safeJson = serializeSafeJsonLd({
+    headline: "</script><script>alert(1)</script>",
+  });
+  assert.equal(safeJson.includes("</script>"), false);
+  assert.ok(safeJson.includes("\\u003c/script\\u003e"));
+});

@@ -4,11 +4,18 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, Calendar, Clock } from "lucide-react";
 import { getArticleBySlug, getProfile } from "@/lib/db";
 import { isAuthenticated } from "@/lib/auth";
-import { getDictionary, getLocale } from "@/lib/i18n";
+import { getDictionary, getLocale, localePath } from "@/lib/i18n";
+import {
+  absoluteUrl,
+  buildAlternates,
+  buildArticleJsonLd,
+  canonicalUrlFor,
+} from "@/lib/seo";
 import { localizeArticle, localizeProfile } from "@/lib/translator";
 import { formatDate } from "@/lib/utils";
 import { MarkdownRenderer } from "@/components/MarkdownRenderer";
 import { ShareButton } from "@/components/ShareButton";
+import { JsonLd } from "@/components/JsonLd";
 
 export const dynamic = "force-dynamic";
 
@@ -16,14 +23,64 @@ export async function generateMetadata(context: {
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await context.params;
-  const [locale, admin] = await Promise.all([getLocale(), isAuthenticated()]);
+  const [locale, admin, rawProfile] = await Promise.all([
+    getLocale(),
+    isAuthenticated(),
+    getProfile(),
+  ]);
   const dict = getDictionary(locale);
   const rawArticle = await getArticleBySlug(slug, admin);
-  if (!rawArticle) return { title: dict.articles.notFoundTitle };
-  const article = await localizeArticle(rawArticle, locale);
+  if (!rawArticle) {
+    return {
+      title: dict.articles.notFoundTitle,
+      robots: { index: false, follow: false },
+    };
+  }
+
+  const [article, profile] = await Promise.all([
+    localizeArticle(rawArticle, locale),
+    localizeProfile(rawProfile, locale),
+  ]);
+
+  const cleanPath = `/articles/${rawArticle.slug}`;
+  const canonicalUrl = canonicalUrlFor(cleanPath, locale);
+  const ogImg = absoluteUrl(article.coverImage || "/logo.jpg");
+
   return {
     title: article.title,
     description: article.excerpt,
+    keywords: [article.category, ...article.tags].filter(Boolean),
+    authors: [{ name: profile.ownerName, url: canonicalUrlFor("/about", locale) }],
+    alternates: buildAlternates(cleanPath, locale),
+    ...(!rawArticle.published
+      ? { robots: { index: false, follow: false } }
+      : {}),
+    openGraph: {
+      type: "article",
+      title: article.title,
+      description: article.excerpt,
+      url: canonicalUrl,
+      siteName: profile.siteName,
+      locale: locale === "en" ? "en_US" : "tr_TR",
+      alternateLocale: locale === "en" ? ["tr_TR"] : ["en_US"],
+      publishedTime: article.createdAt,
+      modifiedTime: article.updatedAt || article.createdAt,
+      authors: [profile.ownerName],
+      section: article.category,
+      tags: article.tags,
+      images: [
+        {
+          url: ogImg,
+          alt: article.title,
+        },
+      ],
+    },
+    twitter: {
+      card: article.coverImage ? "summary_large_image" : "summary",
+      title: article.title,
+      description: article.excerpt,
+      images: [ogImg],
+    },
   };
 }
 
@@ -48,11 +105,15 @@ export default async function ArticleDetailPage(context: {
     localizeProfile(rawProfile, locale),
   ]);
 
+  const jsonLd = buildArticleJsonLd(article, profile, locale);
+
   return (
     <article className="max-w-3xl mx-auto px-4 sm:px-6 py-12 space-y-8">
+      {rawArticle.published && <JsonLd data={jsonLd} />}
+
       <div className="flex items-center justify-between">
         <Link
-          href="/articles"
+          href={localePath("/articles", locale)}
           className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -126,15 +187,18 @@ export default async function ArticleDetailPage(context: {
           <p className="text-xs font-mono uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
             {dict.articles.authorLabel}
           </p>
-          <p className="font-bold text-slate-900 dark:text-white mt-0.5">
+          <Link
+            href={localePath("/about", locale)}
+            className="font-bold text-slate-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors mt-0.5 inline-block"
+          >
             {profile.ownerName}
-          </p>
+          </Link>
           <p className="text-sm text-slate-600 dark:text-zinc-400 mt-1">
             {profile.roleTitle}
           </p>
         </div>
         <Link
-          href="/apps"
+          href={localePath("/apps", locale)}
           className="inline-flex items-center justify-center px-4 py-2 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white transition-colors shrink-0"
         >
           {dict.articles.authorCta}

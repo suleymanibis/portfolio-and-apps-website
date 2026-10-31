@@ -3,6 +3,7 @@ import { ExternalLink, Github, Pin } from "lucide-react";
 import { getProfile } from "@/lib/db";
 import { extractSafeGitHubUsername, getPinnedRepos } from "@/lib/github";
 import { getDictionary, getLocale } from "@/lib/i18n";
+import { buildAlternates, canonicalUrlFor } from "@/lib/seo";
 import { localizePinnedRepos } from "@/lib/translator";
 import { ReposExplorer } from "@/components/ReposExplorer";
 
@@ -14,6 +15,15 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: dict.repos.metaTitle,
     description: dict.repos.metaDesc,
+    alternates: buildAlternates("/repos", locale),
+    openGraph: {
+      title: dict.repos.metaTitle,
+      description: dict.repos.metaDesc,
+      url: canonicalUrlFor("/repos", locale),
+      locale: locale === "en" ? "en_US" : "tr_TR",
+      alternateLocale: locale === "en" ? ["tr_TR"] : ["en_US"],
+      type: "website",
+    },
   };
 }
 

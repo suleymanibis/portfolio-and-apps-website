@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { getDictionary, getLocale } from "@/lib/i18n";
+import { getDictionary, getLocale, localePath } from "@/lib/i18n";
 
 export default async function NotFound() {
   const locale = await getLocale();
@@ -18,7 +18,7 @@ export default async function NotFound() {
         {dict.notFound.desc}
       </p>
       <Link
-        href="/"
+        href={localePath("/", locale)}
         className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold transition-colors"
       >
         <ArrowLeft className="w-4 h-4" />

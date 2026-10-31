@@ -14,7 +14,7 @@ import {
   X,
 } from "lucide-react";
 import type { Locale } from "@/types";
-import { dictionaries } from "@/lib/i18n";
+import { dictionaries, localePath, stripLocalePrefix } from "@/lib/i18n";
 import { ThemeToggle } from "./ThemeToggle";
 import { LanguageToggle } from "./LanguageToggle";
 
@@ -24,26 +24,29 @@ interface NavbarProps {
 }
 
 export function Navbar({ siteName, locale = "tr" }: NavbarProps) {
-  const pathname = usePathname();
+  const pathname = usePathname() || "/";
+  const cleanPathname = stripLocalePrefix(pathname);
   const [mobileOpen, setMobileOpen] = useState(false);
   const t = dictionaries[locale]?.nav ?? dictionaries.tr.nav;
 
   const navLinks = [
-    { href: "/", label: t.home, icon: Code2 },
-    { href: "/apps", label: t.apps, icon: Layers },
-    { href: "/repos", label: t.repos, icon: FolderGit2 },
-    { href: "/articles", label: t.articles, icon: FileText },
-    { href: "/about", label: t.about, icon: User },
+    { baseHref: "/", label: t.home, icon: Code2 },
+    { baseHref: "/apps", label: t.apps, icon: Layers },
+    { baseHref: "/repos", label: t.repos, icon: FolderGit2 },
+    { baseHref: "/articles", label: t.articles, icon: FileText },
+    { baseHref: "/about", label: t.about, icon: User },
   ];
 
-  const isActive = (href: string) =>
-    href === "/" ? pathname === "/" : pathname.startsWith(href);
+  const isActive = (baseHref: string) =>
+    baseHref === "/"
+      ? cleanPathname === "/"
+      : cleanPathname.startsWith(baseHref);
 
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200/80 dark:border-zinc-800/80 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
         <Link
-          href="/"
+          href={localePath("/", locale)}
           className="flex items-center gap-2.5 font-bold text-lg tracking-tight text-slate-900 dark:text-white group"
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -72,11 +75,11 @@ export function Navbar({ siteName, locale = "tr" }: NavbarProps) {
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-1">
           {navLinks.map((link) => {
-            const active = isActive(link.href);
+            const active = isActive(link.baseHref);
             return (
               <Link
-                key={link.href}
-                href={link.href}
+                key={link.baseHref}
+                href={localePath(link.baseHref, locale)}
                 className={`px-3.5 py-2 rounded-lg text-sm font-medium transition-colors ${
                   active
                     ? "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
@@ -126,11 +129,11 @@ export function Navbar({ siteName, locale = "tr" }: NavbarProps) {
         <div className="md:hidden border-t border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 px-4 py-3 space-y-1">
           {navLinks.map((link) => {
             const Icon = link.icon;
-            const active = isActive(link.href);
+            const active = isActive(link.baseHref);
             return (
               <Link
-                key={link.href}
-                href={link.href}
+                key={link.baseHref}
+                href={localePath(link.baseHref, locale)}
                 onClick={() => setMobileOpen(false)}
                 className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium ${
                   active

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { FileText } from "lucide-react";
 import { getArticles } from "@/lib/db";
 import { getDictionary, getLocale } from "@/lib/i18n";
+import { buildAlternates, canonicalUrlFor } from "@/lib/seo";
 import { localizeArticles } from "@/lib/translator";
 import { ArticlesExplorer } from "@/components/ArticlesExplorer";
 
@@ -13,6 +14,15 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: dict.articles.metaTitle,
     description: dict.articles.metaDesc,
+    alternates: buildAlternates("/articles", locale),
+    openGraph: {
+      title: dict.articles.metaTitle,
+      description: dict.articles.metaDesc,
+      url: canonicalUrlFor("/articles", locale),
+      locale: locale === "en" ? "en_US" : "tr_TR",
+      alternateLocale: locale === "en" ? ["tr_TR"] : ["en_US"],
+      type: "website",
+    },
   };
 }
 

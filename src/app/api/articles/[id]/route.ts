@@ -86,6 +86,7 @@ export async function PUT(
     revalidatePath("/");
     revalidatePath("/articles");
     revalidatePath(`/articles/${updated.slug}`);
+    revalidatePath("/sitemap.xml");
     return NextResponse.json(updated);
   } catch {
     return NextResponse.json(

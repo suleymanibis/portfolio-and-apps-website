@@ -9,11 +9,18 @@ import {
   Github,
   Tag,
 } from "lucide-react";
-import { getAppBySlug } from "@/lib/db";
-import { getDictionary, getLocale } from "@/lib/i18n";
-import { localizeApp } from "@/lib/translator";
+import { getAppBySlug, getProfile } from "@/lib/db";
+import { getDictionary, getLocale, localePath } from "@/lib/i18n";
+import {
+  absoluteUrl,
+  buildAlternates,
+  buildSoftwareAppJsonLd,
+  canonicalUrlFor,
+} from "@/lib/seo";
+import { localizeApp, localizeProfile } from "@/lib/translator";
 import { formatDate, getStatusInfo } from "@/lib/utils";
 import { MarkdownRenderer } from "@/components/MarkdownRenderer";
+import { JsonLd } from "@/components/JsonLd";
 
 export const dynamic = "force-dynamic";
 
@@ -21,13 +28,55 @@ export async function generateMetadata(context: {
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await context.params;
-  const [locale, rawApp] = await Promise.all([getLocale(), getAppBySlug(slug)]);
+  const [locale, rawApp, rawProfile] = await Promise.all([
+    getLocale(),
+    getAppBySlug(slug),
+    getProfile(),
+  ]);
   const dict = getDictionary(locale);
-  if (!rawApp) return { title: dict.apps.notFoundTitle };
-  const app = await localizeApp(rawApp, locale);
+  if (!rawApp) {
+    return {
+      title: dict.apps.notFoundTitle,
+      robots: { index: false, follow: false },
+    };
+  }
+
+  const [app, profile] = await Promise.all([
+    localizeApp(rawApp, locale),
+    localizeProfile(rawProfile, locale),
+  ]);
+
+  const cleanPath = `/apps/${rawApp.slug}`;
+  const canonicalUrl = canonicalUrlFor(cleanPath, locale);
+  const ogImg = absoluteUrl(app.coverImage || "/logo.jpg");
+
   return {
     title: app.title,
     description: app.tagline,
+    keywords: [app.category, ...app.techStack].filter(Boolean),
+    authors: [{ name: profile.ownerName, url: canonicalUrlFor("/about", locale) }],
+    alternates: buildAlternates(cleanPath, locale),
+    openGraph: {
+      type: "website",
+      title: app.title,
+      description: app.tagline,
+      url: canonicalUrl,
+      siteName: profile.siteName,
+      locale: locale === "en" ? "en_US" : "tr_TR",
+      alternateLocale: locale === "en" ? ["tr_TR"] : ["en_US"],
+      images: [
+        {
+          url: ogImg,
+          alt: app.title,
+        },
+      ],
+    },
+    twitter: {
+      card: app.coverImage ? "summary_large_image" : "summary",
+      title: app.title,
+      description: app.tagline,
+      images: [ogImg],
+    },
   };
 }
 
@@ -35,20 +84,30 @@ export default async function AppDetailPage(context: {
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await context.params;
-  const [locale, rawApp] = await Promise.all([getLocale(), getAppBySlug(slug)]);
+  const [locale, rawApp, rawProfile] = await Promise.all([
+    getLocale(),
+    getAppBySlug(slug),
+    getProfile(),
+  ]);
 
   if (!rawApp) {
     notFound();
   }
 
   const dict = getDictionary(locale);
-  const app = await localizeApp(rawApp, locale);
+  const [app, profile] = await Promise.all([
+    localizeApp(rawApp, locale),
+    localizeProfile(rawProfile, locale),
+  ]);
   const statusInfo = getStatusInfo(app.status, locale);
+  const jsonLd = buildSoftwareAppJsonLd(app, profile, locale);
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12 space-y-8">
+      <JsonLd data={jsonLd} />
+
       <Link
-        href="/apps"
+        href={localePath("/apps", locale)}
         className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
       >
         <ArrowLeft className="w-4 h-4" />

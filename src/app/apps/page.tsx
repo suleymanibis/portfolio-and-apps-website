@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Layers } from "lucide-react";
 import { getApps } from "@/lib/db";
 import { getDictionary, getLocale } from "@/lib/i18n";
+import { buildAlternates, canonicalUrlFor } from "@/lib/seo";
 import { localizeApps } from "@/lib/translator";
 import { AppsExplorer } from "@/components/AppsExplorer";
 
@@ -13,6 +14,15 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: dict.apps.metaTitle,
     description: dict.apps.metaDesc,
+    alternates: buildAlternates("/apps", locale),
+    openGraph: {
+      title: dict.apps.metaTitle,
+      description: dict.apps.metaDesc,
+      url: canonicalUrlFor("/apps", locale),
+      locale: locale === "en" ? "en_US" : "tr_TR",
+      alternateLocale: locale === "en" ? ["tr_TR"] : ["en_US"],
+      type: "website",
+    },
   };
 }
 

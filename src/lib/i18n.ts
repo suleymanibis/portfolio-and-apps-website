@@ -1,10 +1,30 @@
 import type { Locale } from "@/types";
 
+export const SITE_URL = "https://suleymanibis.dev";
 export const LANG_COOKIE_NAME = "site_lang";
+
+export function localePath(path: string, locale: Locale): string {
+  const normalized = path.startsWith("/") ? path : `/${path}`;
+  if (locale === "en") {
+    return normalized === "/" ? "/en" : `/en${normalized}`;
+  }
+  return normalized;
+}
+
+export function stripLocalePrefix(pathname: string): string {
+  if (pathname === "/en") return "/";
+  if (pathname.startsWith("/en/")) return pathname.slice(3);
+  return pathname || "/";
+}
 
 export async function getLocale(): Promise<Locale> {
   try {
-    const { cookies } = await import("next/headers");
+    const { headers, cookies } = await import("next/headers");
+    const headerStore = await headers();
+    const headerLocale = headerStore.get("x-site-locale");
+    if (headerLocale === "en") return "en";
+    if (headerLocale === "tr") return "tr";
+
     const cookieStore = await cookies();
     const val = cookieStore.get(LANG_COOKIE_NAME)?.value;
     return val === "en" ? "en" : "tr";

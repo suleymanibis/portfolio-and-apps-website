@@ -12,10 +12,17 @@ import {
   User,
 } from "lucide-react";
 import { getAbout, getProfile } from "@/lib/db";
-import { getDictionary, getLocale } from "@/lib/i18n";
+import { getDictionary, getLocale, localePath } from "@/lib/i18n";
+import {
+  absoluteUrl,
+  buildAboutProfileJsonLd,
+  buildAlternates,
+  canonicalUrlFor,
+} from "@/lib/seo";
 import { localizeAbout, localizeProfile } from "@/lib/translator";
 import { MarkdownRenderer } from "@/components/MarkdownRenderer";
 import { SocialLinks } from "@/components/SocialLinks";
+import { JsonLd } from "@/components/JsonLd";
 
 export const dynamic = "force-dynamic";
 
@@ -23,9 +30,28 @@ export async function generateMetadata(): Promise<Metadata> {
   const [locale, rawAbout] = await Promise.all([getLocale(), getAbout()]);
   const dict = getDictionary(locale);
   const about = await localizeAbout(rawAbout, locale);
+  const description = about.subheadline || dict.about.metaDesc;
+  const ogImg = absoluteUrl(about.photoUrl || "/logo.jpg");
+
   return {
     title: dict.about.metaTitle,
-    description: about.subheadline || dict.about.metaDesc,
+    description,
+    alternates: buildAlternates("/about", locale),
+    openGraph: {
+      title: dict.about.metaTitle,
+      description,
+      url: canonicalUrlFor("/about", locale),
+      locale: locale === "en" ? "en_US" : "tr_TR",
+      alternateLocale: locale === "en" ? ["tr_TR"] : ["en_US"],
+      type: "profile",
+      images: [{ url: ogImg, alt: about.headline }],
+    },
+    twitter: {
+      card: "summary",
+      title: dict.about.metaTitle,
+      description,
+      images: [ogImg],
+    },
   };
 }
 
@@ -52,15 +78,17 @@ export default async function AboutPage() {
 
   const photoSrc = about.photoUrl || profile.avatarUrl;
   const initials = getInitials(profile.ownerName || "Sİ");
+  const jsonLd = buildAboutProfileJsonLd(profile, about, locale);
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12 sm:py-16 space-y-12">
+      <JsonLd data={jsonLd} />
+
       {/* Hero / Intro Card */}
       <section className="relative rounded-3xl border border-slate-200 dark:border-zinc-800/90 bg-white/85 dark:bg-zinc-900/65 backdrop-blur-sm p-7 sm:p-10 overflow-hidden shadow-xs">
         <div className="absolute -top-24 -right-24 w-72 h-72 bg-indigo-500/15 dark:bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative flex flex-col md:flex-row items-start md:items-center gap-7">
-          {/* Profile Photo or Stylish Monogram Avatar */}
           <div className="shrink-0">
             {photoSrc ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -83,7 +111,6 @@ export default async function AboutPage() {
             )}
           </div>
 
-          {/* Intro Text & Actions */}
           <div className="flex-1 space-y-4">
             <div className="flex flex-wrap items-center gap-3">
               <span className="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
@@ -157,7 +184,6 @@ export default async function AboutPage() {
 
       {/* Education & Skills Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Education Timeline */}
         {about.education.length > 0 && (
           <section className="lg:col-span-5 space-y-5">
             <div className="flex items-center gap-2">
@@ -195,7 +221,6 @@ export default async function AboutPage() {
           </section>
         )}
 
-        {/* Skills & Development Environments */}
         {about.skillGroups.length > 0 && (
           <section
             className={`${
@@ -248,14 +273,14 @@ export default async function AboutPage() {
 
         <div className="flex flex-wrap items-center gap-3 shrink-0">
           <Link
-            href="/repos"
+            href={localePath("/repos", locale)}
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white transition-colors"
           >
             <FolderGit2 className="w-4 h-4" />
             <span>{dict.about.exploreRepos}</span>
           </Link>
           <Link
-            href="/apps"
+            href={localePath("/apps", locale)}
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 hover:border-indigo-500/50 transition-colors"
           >
             <Layers className="w-4 h-4" />

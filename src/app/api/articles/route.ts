@@ -78,6 +78,7 @@ export async function POST(request: Request) {
 
     revalidatePath("/");
     revalidatePath("/articles");
+    revalidatePath("/sitemap.xml");
     return NextResponse.json(created, { status: 201 });
   } catch {
     return NextResponse.json(
