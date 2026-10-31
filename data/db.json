@@ -134,31 +134,6 @@
       ]
     }
   },
-  "apps": [
-    {
-      "title": "Deneme",
-      "slug": "deneme",
-      "tagline": "Deneme",
-      "description": "Deneme",
-      "coverImage": "",
-      "category": "Web Uygulaması",
-      "techStack": [],
-      "demoUrl": "",
-      "repoUrl": "",
-      "downloadUrl": "",
-      "version": "v1.0.0",
-      "status": "live",
-      "featured": true,
-      "en": {
-        "title": "trial",
-        "tagline": "trial",
-        "description": "Attempt",
-        "category": "Web Application"
-      },
-      "id": "app-1793462496050",
-      "createdAt": "2026-10-31T16:01:36.050Z",
-      "updatedAt": "2026-10-31T16:01:36.050Z"
-    }
-  ],
+  "apps": [],
   "articles": []
 }
