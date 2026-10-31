@@ -9,6 +9,7 @@ import {
   readBoundedJson,
   sanitizeHttpUrl,
   sanitizeImageUrl,
+  sanitizeSocialValue,
   verifySameOrigin,
 } from "@/lib/security";
 import { SiteProfile } from "@/types";
@@ -62,6 +63,12 @@ export async function PUT(request: Request) {
       githubUrl: sanitizeHttpUrl(body.githubUrl),
       twitterUrl: sanitizeHttpUrl(body.twitterUrl),
       linkedinUrl: sanitizeHttpUrl(body.linkedinUrl),
+      instagramUrl: sanitizeSocialValue(
+        body.instagramUrl,
+        "https://instagram.com/"
+      ),
+      micupUrl: sanitizeSocialValue(body.micupUrl),
+      discordUrl: sanitizeSocialValue(body.discordUrl),
       email: validEmail,
       en,
     };
@@ -69,6 +76,7 @@ export async function PUT(request: Request) {
     const updated = await updateProfile(safeProfile);
     revalidatePath("/");
     revalidatePath("/apps");
+    revalidatePath("/repos");
     revalidatePath("/articles");
     return NextResponse.json(updated);
   } catch {

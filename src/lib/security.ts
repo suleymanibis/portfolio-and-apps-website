@@ -337,6 +337,47 @@ export function sanitizeHttpUrl(value: unknown): string {
 }
 
 /**
+ * Sanitizes a social profile link OR username/handle.
+ * - Valid http(s):// URLs are returned normalized.
+ * - Bare known social domains (e.g. instagram.com/user, discord.gg/abc, micup.gg/abc) get https:// prepended.
+ * - Safe handles (@user, user_name, user#1234) either map to `autoUrlPrefix + handle` (e.g. Instagram)
+ *   or are kept as a clean handle string (for Discord / MicUp copy-on-click).
+ * - Dangerous schemes (javascript:, data:, etc.) or HTML characters are rejected.
+ */
+export function sanitizeSocialValue(
+  value: unknown,
+  autoUrlPrefix?: string
+): string {
+  const raw = cleanText(value, 300);
+  if (!raw) return "";
+
+  if (/^https?:\/\//i.test(raw)) {
+    return sanitizeHttpUrl(raw);
+  }
+
+  if (
+    /^(?:www\.)?(?:instagram\.com|discord\.gg|discord\.com|discordapp\.com|micup\.gg|micup\.app|x\.com|twitter\.com|linkedin\.com|github\.com)\/.+/i.test(
+      raw
+    )
+  ) {
+    return sanitizeHttpUrl(`https://${raw}`);
+  }
+
+  // Block any other colon/scheme or HTML/path characters
+  if (/[:<>/"'\\`\s]/.test(raw)) {
+    return "";
+  }
+
+  if (/^@?[a-zA-Z0-9._#-]{1,64}$/.test(raw)) {
+    const cleanHandle = raw.replace(/^@/, "");
+    if (!cleanHandle) return "";
+    return autoUrlPrefix ? `${autoUrlPrefix}${cleanHandle}` : raw;
+  }
+
+  return "";
+}
+
+/**
  * Sanitizes links inside Markdown content.
  * Blocks protocol-relative URLs (//evil.com, /\evil.com) and dangerous schemes.
  */

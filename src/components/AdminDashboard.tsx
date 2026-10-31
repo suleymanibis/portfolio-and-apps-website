@@ -1592,6 +1592,51 @@ export function AdminDashboard({
 
             <div>
               <label className="block text-xs font-semibold mb-1.5">
+                Instagram (URL veya @kullanici)
+              </label>
+              <input
+                type="text"
+                value={profile.instagramUrl || ""}
+                onChange={(e) =>
+                  setProfile({ ...profile, instagramUrl: e.target.value })
+                }
+                placeholder="https://instagram.com/kullanici"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-950 text-sm"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold mb-1.5">
+                MicUp (URL veya Kullanıcı Adı)
+              </label>
+              <input
+                type="text"
+                value={profile.micupUrl || ""}
+                onChange={(e) =>
+                  setProfile({ ...profile, micupUrl: e.target.value })
+                }
+                placeholder="https://micup.gg/... veya kullaniciadi"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-950 text-sm"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold mb-1.5">
+                Discord (URL veya Kullanıcı Adı)
+              </label>
+              <input
+                type="text"
+                value={profile.discordUrl || ""}
+                onChange={(e) =>
+                  setProfile({ ...profile, discordUrl: e.target.value })
+                }
+                placeholder="https://discord.gg/... veya kullaniciadi"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-950 text-sm"
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block text-xs font-semibold mb-1.5">
                 İletişim E-posta Adresi
               </label>
               <input

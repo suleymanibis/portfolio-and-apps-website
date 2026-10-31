@@ -1,7 +1,11 @@
 import fs from "fs/promises";
 import path from "path";
 import { AppItem, ArticleItem, DatabaseSchema, SiteProfile } from "@/types";
-import { sanitizeHttpUrl, sanitizeImageUrl } from "@/lib/security";
+import {
+  sanitizeHttpUrl,
+  sanitizeImageUrl,
+  sanitizeSocialValue,
+} from "@/lib/security";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 const DB_FILE = path.join(DATA_DIR, "db.json");
@@ -18,6 +22,9 @@ const initialSeedData: DatabaseSchema = {
     githubUrl: "https://github.com/suleymanibis",
     twitterUrl: "",
     linkedinUrl: "",
+    instagramUrl: "",
+    micupUrl: "",
+    discordUrl: "",
     email: "",
   },
   apps: [
@@ -182,6 +189,12 @@ function normalizeDbOnRead(rawDb: DatabaseSchema): DatabaseSchema {
       githubUrl: sanitizeHttpUrl(rawDb.profile?.githubUrl),
       twitterUrl: sanitizeHttpUrl(rawDb.profile?.twitterUrl),
       linkedinUrl: sanitizeHttpUrl(rawDb.profile?.linkedinUrl),
+      instagramUrl: sanitizeSocialValue(
+        rawDb.profile?.instagramUrl,
+        "https://instagram.com/"
+      ),
+      micupUrl: sanitizeSocialValue(rawDb.profile?.micupUrl),
+      discordUrl: sanitizeSocialValue(rawDb.profile?.discordUrl),
     },
     apps: Array.isArray(rawDb.apps)
       ? rawDb.apps.map((app) => ({

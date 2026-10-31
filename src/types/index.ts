@@ -73,6 +73,9 @@ export interface SiteProfile {
   githubUrl?: string;
   twitterUrl?: string;
   linkedinUrl?: string;
+  instagramUrl?: string;
+  micupUrl?: string;
+  discordUrl?: string;
   email?: string;
   en?: ProfileTranslation;
 }

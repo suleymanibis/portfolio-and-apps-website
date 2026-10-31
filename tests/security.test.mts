@@ -12,6 +12,7 @@ import {
   sanitizeHttpUrl,
   sanitizeImageUrl,
   sanitizeMarkdownHref,
+  sanitizeSocialValue,
   verifySameOrigin,
 } from "../src/lib/security.ts";
 import {
@@ -200,6 +201,19 @@ test("6. URL & Markdown link sanitizers block XSS, protocol-relative URLs & trav
   // Entity ID validation
   assert.equal(isValidEntityId("app-1730000000"), true);
   assert.equal(isValidEntityId("../db.json"), false);
+
+  // Social links & handles (Instagram, MicUp, Discord)
+  assert.equal(
+    sanitizeSocialValue("@suleymanibis", "https://instagram.com/"),
+    "https://instagram.com/suleymanibis"
+  );
+  assert.equal(
+    sanitizeSocialValue("https://micup.gg/suleyman"),
+    "https://micup.gg/suleyman"
+  );
+  assert.equal(sanitizeSocialValue("suleymanibis"), "suleymanibis");
+  assert.equal(sanitizeSocialValue("javascript:alert(1)"), "");
+  assert.equal(sanitizeSocialValue("<script>alert(1)</script>"), "");
 });
 
 test("7. Binary magic-byte image validator accepts real raster images & blocks SVG/HTML/EXE", () => {

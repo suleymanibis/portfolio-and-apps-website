@@ -3,14 +3,10 @@ import {
   ArrowRight,
   FileText,
   FolderGit2,
-  Github,
   Layers,
-  Linkedin,
-  Mail,
   MapPin,
   Pin,
   Sparkles,
-  Twitter,
 } from "lucide-react";
 import { getApps, getArticles, getProfile } from "@/lib/db";
 import { getPinnedRepos } from "@/lib/github";
@@ -24,6 +20,7 @@ import {
 import { AppCard } from "@/components/AppCard";
 import { ArticleCard } from "@/components/ArticleCard";
 import { PinnedRepoCard } from "@/components/PinnedRepoCard";
+import { SocialLinks } from "@/components/SocialLinks";
 
 export const dynamic = "force-dynamic";
 
@@ -107,49 +104,8 @@ export default async function HomePage() {
               <span>{dict.hero.readArticles}</span>
             </Link>
 
-            <div className="flex items-center gap-1.5 sm:ml-1">
-              {profile.githubUrl && (
-                <a
-                  href={profile.githubUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="GitHub"
-                  className="p-2.5 rounded-xl border border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white hover:border-slate-300 dark:hover:border-zinc-700 transition-colors"
-                >
-                  <Github className="w-4 h-4" />
-                </a>
-              )}
-              {profile.twitterUrl && (
-                <a
-                  href={profile.twitterUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="X / Twitter"
-                  className="p-2.5 rounded-xl border border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white hover:border-slate-300 dark:hover:border-zinc-700 transition-colors"
-                >
-                  <Twitter className="w-4 h-4" />
-                </a>
-              )}
-              {profile.linkedinUrl && (
-                <a
-                  href={profile.linkedinUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="LinkedIn"
-                  className="p-2.5 rounded-xl border border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white hover:border-slate-300 dark:hover:border-zinc-700 transition-colors"
-                >
-                  <Linkedin className="w-4 h-4" />
-                </a>
-              )}
-              {profile.email && (
-                <a
-                  href={`mailto:${profile.email}`}
-                  aria-label="Email"
-                  className="p-2.5 rounded-xl border border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white hover:border-slate-300 dark:hover:border-zinc-700 transition-colors"
-                >
-                  <Mail className="w-4 h-4" />
-                </a>
-              )}
+            <div className="sm:ml-1">
+              <SocialLinks profile={profile} locale={locale} variant="hero" />
             </div>
           </div>
         </div>
