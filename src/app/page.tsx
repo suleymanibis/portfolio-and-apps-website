@@ -2,25 +2,30 @@ import Link from "next/link";
 import {
   ArrowRight,
   FileText,
+  FolderGit2,
   Github,
   Layers,
   Linkedin,
   Mail,
   MapPin,
+  Pin,
   Sparkles,
   Twitter,
 } from "lucide-react";
 import { getApps, getArticles, getProfile } from "@/lib/db";
+import { getPinnedRepos } from "@/lib/github";
 import { AppCard } from "@/components/AppCard";
 import { ArticleCard } from "@/components/ArticleCard";
+import { PinnedRepoCard } from "@/components/PinnedRepoCard";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [profile, apps, articles] = await Promise.all([
-    getProfile(),
+  const profile = await getProfile();
+  const [apps, articles, pinnedRepos] = await Promise.all([
     getApps(),
     getArticles(false),
+    getPinnedRepos(profile.githubUrl),
   ]);
 
   const featuredApps = apps.filter((a) => a.featured).slice(0, 3);
@@ -71,6 +76,13 @@ export default async function HomePage() {
               <span>Uygulamaları Keşfet</span>
             </Link>
             <Link
+              href="/repos"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:border-indigo-500/50 text-slate-800 dark:text-zinc-200 transition-colors"
+            >
+              <FolderGit2 className="w-4 h-4" />
+              <span>GitHub Repoları</span>
+            </Link>
+            <Link
               href="/articles"
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:border-indigo-500/50 text-slate-800 dark:text-zinc-200 transition-colors"
             >
@@ -78,7 +90,7 @@ export default async function HomePage() {
               <span>Makaleleri Oku</span>
             </Link>
 
-            <div className="flex items-center gap-1.5 sm:ml-2">
+            <div className="flex items-center gap-1.5 sm:ml-1">
               {profile.githubUrl && (
                 <a
                   href={profile.githubUrl}
@@ -126,13 +138,21 @@ export default async function HomePage() {
         </div>
 
         {/* Quick Metrics */}
-        <div className="relative grid grid-cols-2 sm:grid-cols-3 gap-4 mt-10 pt-8 border-t border-slate-200/70 dark:border-zinc-800/80">
+        <div className="relative grid grid-cols-3 gap-4 mt-10 pt-8 border-t border-slate-200/70 dark:border-zinc-800/80">
           <div>
             <p className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
               {apps.length}
             </p>
             <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400">
               Yayınlanan Uygulama
+            </p>
+          </div>
+          <div>
+            <p className="text-2xl sm:text-3xl font-extrabold text-indigo-600 dark:text-indigo-400">
+              {pinnedRepos.length}
+            </p>
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400">
+              Sabitli GitHub Reposu
             </p>
           </div>
           <div>
@@ -143,16 +163,41 @@ export default async function HomePage() {
               Teknik Makale & Yazı
             </p>
           </div>
-          <div className="col-span-2 sm:col-span-1">
-            <p className="text-2xl sm:text-3xl font-extrabold text-indigo-600 dark:text-indigo-400">
-              100%
-            </p>
-            <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400">
-              Açık Paylaşım & Üretim
-            </p>
-          </div>
         </div>
       </section>
+
+      {/* Pinned GitHub Repositories Section */}
+      {pinnedRepos.length > 0 && (
+        <section className="space-y-6">
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <div className="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-wider text-indigo-600 dark:text-indigo-400 mb-1">
+                <Pin className="w-3.5 h-3.5" />
+                <span>GitHub • Sabitlenenler</span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
+                Sabitlenen GitHub Repolarım
+              </h2>
+            </div>
+            <Link
+              href="/repos"
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:underline shrink-0"
+            >
+              <span>Tümünü Gör ({pinnedRepos.length})</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {pinnedRepos.slice(0, 6).map((repo) => (
+              <PinnedRepoCard
+                key={`${repo.owner}/${repo.name}`}
+                repo={repo}
+              />
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Featured Apps Section */}
       <section className="space-y-6">

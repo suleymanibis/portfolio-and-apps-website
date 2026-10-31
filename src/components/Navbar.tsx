@@ -3,7 +3,15 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { Code2, FileText, Layers, LayoutDashboard, Menu, X } from "lucide-react";
+import {
+  Code2,
+  FileText,
+  FolderGit2,
+  Layers,
+  LayoutDashboard,
+  Menu,
+  X,
+} from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 
 interface NavbarProps {
@@ -17,6 +25,7 @@ export function Navbar({ siteName }: NavbarProps) {
   const navLinks = [
     { href: "/", label: "Ana Sayfa", icon: Code2 },
     { href: "/apps", label: "Uygulamalar", icon: Layers },
+    { href: "/repos", label: "GitHub Repoları", icon: FolderGit2 },
     { href: "/articles", label: "Makaleler", icon: FileText },
   ];
 

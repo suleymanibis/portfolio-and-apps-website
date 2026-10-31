@@ -50,6 +50,20 @@ export interface SiteProfile {
   email?: string;
 }
 
+export interface PinnedRepoItem {
+  name: string;
+  owner: string;
+  description: string;
+  repoUrl: string;
+  homepageUrl?: string;
+  language?: string;
+  languageColor?: string;
+  stars: number;
+  forks: number;
+  topics: string[];
+  updatedAt?: string;
+}
+
 export interface DatabaseSchema {
   profile: SiteProfile;
   apps: AppItem[];
