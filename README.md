@@ -1,6 +1,6 @@
 # suleymanibis.dev — Bilingual Developer Portfolio, App Showcase & Technical Blog
 
-[![CI/CD Pipeline](https://github.com/suleymanibis/potfolio-and-apps-website/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/suleymanibis/potfolio-and-apps-website/actions/workflows/ci-cd.yml)
+[![CI/CD Pipeline](https://github.com/suleymanibis/portfolio-and-apps-website/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/suleymanibis/portfolio-and-apps-website/actions/workflows/ci-cd.yml)
 
 A full-stack, security-hardened personal portfolio, application showcase, and technical blog platform built with **Next.js 15 (App Router)**, **React 19**, **TypeScript**, and **Tailwind CSS v4**.
 
