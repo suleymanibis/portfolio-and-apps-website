@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-slate-50 text-slate-900 dark:bg-zinc-950 dark:text-zinc-100 antialiased selection:bg-indigo-500/30 selection:text-indigo-600 dark:selection:text-indigo-300 transition-colors duration-200;
+  }
+}
+
+/* Subtle developer grid background */
+.bg-dev-grid {
+  background-size: 36px 36px;
+  background-image: linear-gradient(
+      to right,
+      rgba(120, 120, 140, 0.07) 1px,
+      transparent 1px
+    ),
+    linear-gradient(to bottom, rgba(120, 120, 140, 0.07) 1px, transparent 1px);
+}

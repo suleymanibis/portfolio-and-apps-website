@@ -1,0 +1,80 @@
+{
+  "profile": {
+    "siteName": "suleymanibis.dev",
+    "ownerName": "Süleyman İbiş",
+    "roleTitle": "Yazılım Geliştirici & Bilgisayar Mühendisliği Öğrencisi",
+    "heroGreeting": "Geliştirdiğim uygulamaları ve teknik makalelerimi paylaştığım dijital çalışma alanım.",
+    "bio": "Backend sistemleri, modern web uygulamaları ve geliştirici araçları üzerine projeler üretiyorum. Burada yayına aldığım yazılımları inceleyebilir ve yazılım mühendisliği süreçlerine dair yazdığım makaleleri okuyabilirsiniz.",
+    "location": "Türkiye",
+    "availableForWork": true,
+    "githubUrl": "https://github.com/suleymanibis",
+    "twitterUrl": "",
+    "linkedinUrl": "",
+    "email": ""
+  },
+  "apps": [
+    {
+      "id": "app-1",
+      "title": "FocusFlow Pomodoro & Görev Yöneticisi",
+      "slug": "focusflow-pomodoro-gorev-yoneticisi",
+      "tagline": "Derin çalışma seanslarınızı takip eden minimalist masaüstü ve web üretkenlik aracı.",
+      "description": "## Proje Hakkında\n\n**FocusFlow**, dikkat dağıtıcı unsurları en aza indirerek günlük görevlerinizi Pomodoro tekniğiyle birleştiren modern bir üretkenlik uygulamasıdır.\n\n### Öne Çıkan Özellikler\n- **Akıllı Zamanlayıcı:** Özelleştirilebilir çalışma ve mola periyotları.\n- **Klavye Kısayolları:** Fareye dokunmadan görev ekleme ve zamanlayıcı başlatma.\n- **Haftalık İstatistikler:** Hangi projeye ne kadar vakit ayırdığınızı gösteren grafikler.\n- **Çevrimdışı Çalışma:** Yerel depolama desteği ile internet olmadan da kesintisiz kullanım.",
+      "category": "Üretkenlik",
+      "techStack": [
+        "Next.js",
+        "TypeScript",
+        "Tailwind CSS",
+        "IndexedDB"
+      ],
+      "demoUrl": "https://suleymanibis.dev",
+      "repoUrl": "https://github.com/suleymanibis",
+      "version": "v1.4.0",
+      "status": "live",
+      "featured": true,
+      "createdAt": "2026-09-15T10:00:00.000Z",
+      "updatedAt": "2026-10-20T14:30:00.000Z"
+    },
+    {
+      "id": "app-2",
+      "title": "Commerce Cart Backend & İstemci Araçları",
+      "slug": "commerce-cart-backend-ve-istemci-araclari",
+      "tagline": "E-ticaret sepet ve sipariş akışlarını simüle eden REST API ve çoklu istemci mimarisi.",
+      "description": "## Mimari Genel Bakış\n\nModern e-ticaret sistemlerindeki sepet, stok ve sipariş doğrulama süreçlerini simüle eden uçtan uca bir yazılım ailesidir.\n\n### Bileşenler\n1. **REST API Sunucusu:** Katmanlı mimari ve veritabanı bütünlüğü odaklı arka uç servisi.\n2. **Masaüstü Arayüzü (.NET WinForms):** API uç noktalarıyla etkileşim kuran görsel istemci.\n3. **Python CLI İstemcisi:** Terminal üzerinden hızlı test ve otomasyon aracı.",
+      "category": "Backend & Sistem",
+      "techStack": [
+        "Java",
+        "Spring Boot",
+        "C# .NET",
+        "Python",
+        "PostgreSQL"
+      ],
+      "repoUrl": "https://github.com/suleymanibis",
+      "version": "v2.0.0",
+      "status": "open-source",
+      "featured": true,
+      "createdAt": "2026-08-10T09:00:00.000Z",
+      "updatedAt": "2026-10-05T11:15:00.000Z"
+    }
+  ],
+  "articles": [
+    {
+      "id": "art-1",
+      "title": "Vibe Coding ile Fikirden Ürüne: Hızlı Prototipleme Rehberi",
+      "slug": "vibe-coding-ile-fikirden-urune-hizli-prototipleme-rehberi",
+      "excerpt": "Yapay zeka destekli geliştirme araçlarıyla yazılım üretirken kod kalitesini, güvenliği ve mimari bütünlüğü korumanın pratik yolları.",
+      "content": "Yazılım geliştirme dünyası son yıllarda büyük bir dönüşüm geçiriyor. Artık bir fikri çalışan bir prototipe dönüştürmek haftalar değil, saatler sürüyor. Ancak hız kazandıkça **mimari disiplin** ve **güvenlik** her zamankinden daha önemli hale geliyor.\n\n## 1. Önce Veri Modelini Netleştirin\n\nKod yazmaya başlamadan önce uygulamanızın temel veri tiplerini belirlemek, ileride yaşanacak karmaşayı önler:\n\n```typescript\ninterface Project {\n  id: string;\n  name: string;\n  status: \"draft\" | \"published\";\n  tags: string[];\n}\n```\n\n## 2. Güvenliği Sonraya Bırakmayın\n\nÜrünü canlıya almadan önce kimlik doğrulama, hız sınırlandırma (rate limiting), girdi doğrulama ve HTTP güvenlik başlıklarını mutlaka devreye alın.\n\n> İyi bir ürün, karmaşık özelliklerin yığını değil; tek bir problemi güvenli ve pürüzsüzce çözen sade bir sistemdir.",
+      "category": "Yazılım Geliştirme",
+      "tags": [
+        "Vibe Coding",
+        "Mimari",
+        "Güvenlik",
+        "TypeScript"
+      ],
+      "published": true,
+      "featured": true,
+      "readingTimeMinutes": 3,
+      "createdAt": "2026-10-25T12:00:00.000Z",
+      "updatedAt": "2026-10-25T12:00:00.000Z"
+    }
+  ]
+}
