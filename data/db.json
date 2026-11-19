@@ -154,7 +154,7 @@
       "downloadUrl": "",
       "version": "v1.0.0",
       "status": "live",
-      "featured": false,
+      "featured": true,
       "en": {
         "title": "PhysicsLab",
         "tagline": "Measurement, calculation and graphics application for five experiments in the Physics I laboratory.",
@@ -163,7 +163,7 @@
       },
       "id": "app-1795099532122",
       "createdAt": "2026-11-19T14:45:32.122Z",
-      "updatedAt": "2026-11-19T14:45:32.122Z"
+      "updatedAt": "2026-11-19T15:02:09.756Z"
     },
     {
       "title": "Video İndirme Yöneticisi",
