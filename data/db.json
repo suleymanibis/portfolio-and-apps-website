@@ -135,7 +135,36 @@
     },
     "updatedAt": "2026-10-31T17:02:09.223Z"
   },
-  "apps": [],
+  "apps": [
+    {
+      "title": "Video İndirme Yöneticisi",
+      "slug": "video-indirme-yoneticisi",
+      "tagline": "TV dizi bölümlerini, youtube videolarını indirebileceğiniz bir uygulama.",
+      "description": "",
+      "coverImage": "",
+      "category": "Masaüstü Uygulaması",
+      "techStack": [
+        "C#",
+        ".NET",
+        "WinForms"
+      ],
+      "demoUrl": "",
+      "repoUrl": "",
+      "downloadUrl": "",
+      "version": "v1.0.1",
+      "status": "live",
+      "featured": true,
+      "en": {
+        "title": "Video Download Manager",
+        "tagline": "An application where you can download TV series episodes and YouTube videos.",
+        "description": "",
+        "category": "Desktop Application"
+      },
+      "id": "app-1795096441777",
+      "createdAt": "2026-11-19T13:54:01.777Z",
+      "updatedAt": "2026-11-19T13:54:01.777Z"
+    }
+  ],
   "articles": [
     {
       "title": "Sizce Yapay Zeka Destekli Bir Takım Çalışması Ortamı Yaratılabilir Mi?",
