@@ -168,14 +168,16 @@
     {
       "title": "Video İndirme Yöneticisi",
       "slug": "video-indirme-yoneticisi",
-      "tagline": "TV dizi bölümlerini, youtube videolarını indirebileceğiniz bir uygulama.",
-      "description": "",
+      "tagline": "YouTube videolarını, desteklenen TV bölümlerini ve doğrudan video bağlantılarını Windows’a kaydet.",
+      "description": "Video İndirme Yöneticisi, video bağlantılarını Windows bilgisayara kaydetmek için geliştirilmiş bir masaüstü uygulamasıdır. Bağlantıyı yapıştır, kayıt klasörünü ve tercih ettiğin çözünürlüğü seç, ardından **Videoyu indir** düğmesine bas.\n\n## Özellikler\n\n- YouTube, doğrudan video adresleri ve NOW TV, Kanal D, TRT 1’in desteklenen bölüm bağlantılarıyla çalışır.\n- İndirme ilerlemesini gösterir ve devam eden indirmeyi iptal etmeye olanak tanır.\n- İndirme motoru yt-dlp ilk kullanımda otomatik kurulur. FFmpeg varsa ayrı ses ve görüntü akışları birleştirilebilir.",
       "coverImage": "https://raw.githubusercontent.com/suleymanibis/portfolio-and-apps-website/main/public/uploads/5288428f-d5c1-4765-a3e2-fe416c90c4bb.png",
       "category": "Masaüstü Uygulaması",
       "techStack": [
         "C#",
-        ".NET",
-        "WinForms"
+        ".NET Framework",
+        "WinForms",
+        "yt-dlp",
+        "FFmpeg"
       ],
       "demoUrl": "",
       "repoUrl": "",
@@ -185,13 +187,13 @@
       "featured": true,
       "en": {
         "title": "Video Download Manager",
-        "tagline": "An application where you can download TV series episodes and YouTube videos.",
-        "description": "",
+        "tagline": "Save YouTube videos, supported TV episodes and direct video links to Windows.",
+        "description": "Video Download Manager is a desktop application developed to save video links on Windows computer. Paste the link, select the recording folder and your preferred resolution, then hit the **Download video** button.\n\n## Features\n\n- Works with YouTube, direct video addresses and supported episode links of NOW TV, Kanal D, TRT 1.\n- Shows the download progress and allows canceling the ongoing download.\n- Download engine yt-dlp is automatically installed on first use. Separate audio and video streams can be combined if FFmpeg is available.",
         "category": "Desktop Application"
       },
       "id": "app-1795096441777",
       "createdAt": "2026-11-19T13:54:01.777Z",
-      "updatedAt": "2026-11-19T14:01:19.257Z"
+      "updatedAt": "2026-11-19T15:01:18.674Z"
     }
   ],
   "articles": [
