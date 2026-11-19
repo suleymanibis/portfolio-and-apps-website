@@ -149,7 +149,7 @@
         "Blazor WebAssembly",
         "JavaScript"
       ],
-      "demoUrl": "https://suleymanibis.github.io/fiziklab/",
+      "demoUrl": "https://physicsapp.suleymanibis.dev/",
       "repoUrl": "https://github.com/suleymanibis/fiziklab",
       "downloadUrl": "",
       "version": "v1.0.0",
@@ -163,7 +163,7 @@
       },
       "id": "app-1795099532122",
       "createdAt": "2026-11-19T14:45:32.122Z",
-      "updatedAt": "2026-11-19T15:02:09.756Z"
+      "updatedAt": "2026-11-19T15:08:36.622Z"
     },
     {
       "title": "Video İndirme Yöneticisi",
