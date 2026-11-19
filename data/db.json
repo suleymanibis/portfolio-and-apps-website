@@ -141,7 +141,7 @@
       "slug": "video-indirme-yoneticisi",
       "tagline": "TV dizi bölümlerini, youtube videolarını indirebileceğiniz bir uygulama.",
       "description": "",
-      "coverImage": "",
+      "coverImage": "https://raw.githubusercontent.com/suleymanibis/portfolio-and-apps-website/main/public/uploads/5288428f-d5c1-4765-a3e2-fe416c90c4bb.png",
       "category": "Masaüstü Uygulaması",
       "techStack": [
         "C#",
@@ -162,7 +162,7 @@
       },
       "id": "app-1795096441777",
       "createdAt": "2026-11-19T13:54:01.777Z",
-      "updatedAt": "2026-11-19T13:59:08.489Z"
+      "updatedAt": "2026-11-19T14:01:19.257Z"
     }
   ],
   "articles": [
