@@ -137,6 +137,35 @@
   },
   "apps": [
     {
+      "title": "FizikLab",
+      "slug": "fiziklab",
+      "tagline": "Fizik I laboratuvarındaki beş deney için ölçüm, hesaplama ve grafik uygulaması.",
+      "description": "FizikLab ile Fizik I laboratuvarındaki beş deney için ölçümlerini girip sonuçları ve grafikleri oluşturabilirsin.\n\n- Ölçümler tarayıcıda otomatik saklanır.\n- Grafikler PNG olarak indirilebilir.\n- iPhone’da Safari üzerinden ana ekrana eklenebilir.",
+      "coverImage": "https://suleymanibis.github.io/fiziklab/icon-512.png",
+      "category": "Web Uygulaması",
+      "techStack": [
+        "C#",
+        ".NET",
+        "Blazor WebAssembly",
+        "JavaScript"
+      ],
+      "demoUrl": "https://suleymanibis.github.io/fiziklab/",
+      "repoUrl": "https://github.com/suleymanibis/fiziklab",
+      "downloadUrl": "",
+      "version": "v1.0.0",
+      "status": "live",
+      "featured": false,
+      "en": {
+        "title": "PhysicsLab",
+        "tagline": "Measurement, calculation and graphics application for five experiments in the Physics I laboratory.",
+        "description": "With PhysicsLab, you can enter your measurements and create results and graphs for five experiments in the Physics I laboratory.\n\n- Measurements are automatically stored in the browser.\n- Graphics can be downloaded as PNG.\n- It can be added to the home screen via Safari on iPhone.",
+        "category": "Web Application"
+      },
+      "id": "app-1795099532122",
+      "createdAt": "2026-11-19T14:45:32.122Z",
+      "updatedAt": "2026-11-19T14:45:32.122Z"
+    },
+    {
       "title": "Video İndirme Yöneticisi",
       "slug": "video-indirme-yoneticisi",
       "tagline": "TV dizi bölümlerini, youtube videolarını indirebileceğiniz bir uygulama.",
