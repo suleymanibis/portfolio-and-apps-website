@@ -27,7 +27,7 @@
     "subheadline": "Akdeniz Üniversitesi Bilgisayar Mühendisliği 1. sınıf öğrencisiyim. Backend sistemleri araştırmaya, öğrenmeye ve uçtan uca çalışan yazılımlar geliştirmeye odaklanıyorum.",
     "photoUrl": "https://raw.githubusercontent.com/suleymanibis/portfolio-and-apps-website/main/public/uploads/f9f5198b-b359-4a6c-828b-61bda3507d85.png",
     "cvUrl": "",
-    "currentFocus": "Şu sıralar backend sistemlerinin mimarisini araştırıp öğreniyor; Java (Spring Boot & Hibernate), PostgreSQL ve bu servislerle haberleşen Python CLI ile C# (.NET) istemci uygulamaları geliştiriyorum.",
+    "currentFocus": "Şu sıralar vibecoding ve yapay zeka yönetimini öğreniyor.",
     "storyMarkdown": "## Yazılım Yolculuğum Nasıl Başladı?\n\nBilgisayarlara ve yazılıma olan merakım ortaokul **5. sınıftaki bilgisayar dersinde** başladı. Ekranda gördüğüm programların arka planda nasıl çalıştığını kurcalama isteği, zamanla kendi araçlarımı ve projelerimi üretme tutkusuna dönüştü.\n\nAntalya'da **Akdeniz Üniversitesi**'nde **B2** seviyesinde İngilizce hazırlık eğitimimi tamamladıktan sonra şu an **Bilgisayar Mühendisliği 1. sınıf** öğrencisi olarak akademik eğitimime devam ediyorum.\n\n## Nasıl Üretiyor ve Neye Odaklanıyorum?\n\nBir yazılımı yalnızca tek bir katmandan ibaret görmek yerine, arka uçtan istemciye kadar **uçtan uca nasıl haberleştiğini** deneyimleyerek öğrenmeyi seviyorum. Örneğin Java ile geliştirdiğim bir e-ticaret REST API servisini hem **Python** tabanlı bir komut satırı (CLI) istemcisiyle hem de **C# (.NET WinForms)** ile yazdığım masaüstü arayüzüyle entegre ederek çok katmanlı sistem pratikleri yapıyorum.\n\nFarklı disiplinleri tanımak adına zaman zaman *Unity* ve *Godot* gibi oyun motorlarıyla da kişisel denemeler yaptım; ancak asıl enerjimi ve mühendislik odağımı **backend sistemleri, API tasarımı ve veritabanı mimarisi** üzerine kurdum.",
     "education": [
       {
@@ -82,7 +82,7 @@
       "headline": "Hello, I am Süleyman İbiş.",
       "subheadline": "I am a first year student at Akdeniz University Computer Engineering. I focus on researching and learning backend systems and developing end-to-end working software.",
       "storyMarkdown": "## How Did My Software Journey Begin?\n\nMy interest in computers and software is in secondary school **5. It started in the classroom computer class**. The desire to tinker with how the programs I saw on the screen worked in the background turned into a passion for producing my own tools and projects over time.\n\nAfter completing my English preparatory education at **B2** level at **Akdeniz University** in Antalya, I am currently continuing my academic education as a **Computer Engineering first year** student.\n\n## How Do I Create and What Do I Focus on?\n\nInstead of seeing a software as just a single layer, I like to learn by experiencing how it communicates **end-to-end** from the backend to the client. For example, I implement multi-layered systems by integrating an e-commerce REST API service I developed in Java with both a **Python**-based command line (CLI) client and a desktop interface I wrote in **C# (.NET WinForms)**.\n\nIn order to get to know different disciplines, I also made personal experiments with game engines such as *Unity* and *Godot* from time to time; However, I focused my main energy and engineering focus on **backend systems, API design and database architecture**.",
-      "currentFocus": "He is currently researching and learning the architecture of backend systems; I develop C# (.NET) client applications with Java (Spring Boot & Hibernate), PostgreSQL and Python CLI that communicate with these services.",
+      "currentFocus": "He is currently learning vibecoding and artificial intelligence management.",
       "education": [
         {
           "period": "2026—Present",
@@ -133,7 +133,7 @@
         }
       ]
     },
-    "updatedAt": "2026-10-31T17:02:09.223Z"
+    "updatedAt": "2026-11-20T16:12:14.352Z"
   },
   "apps": [
     {
