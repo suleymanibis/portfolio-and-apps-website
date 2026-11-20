@@ -137,6 +137,34 @@
   },
   "apps": [
     {
+      "title": "Data Warner",
+      "slug": "data-warner",
+      "tagline": "Android’de mobil veri tüketimini takip et, ölçüm oturumu başlat ve kendi kullanım sınırını belirle.",
+      "description": "Data Warner, mobil veri kullanımını ve hotspot üzerinden paylaşılan toplam veriyi izlemek için geliştirdiğim bir Android uygulaması.\n\n## Özellikler\n\n- Mobil veri kullanımını saatlik, günlük ve haftalık grafiklerde incele.\n- Uygulamaların kullanımını ve hotspot toplamını ayrı gör.\n- **Veri Sayacı** ile Başlat ve Bitir arasında harcanan veriyi ölç. Grafik aralıkları oturum süresine göre değişir.\n- Kullanım uyarısının veri sınırını ve süresini ayarla. Varsayılan değer **1 saatte 3 GB**.\n\n## Kurulum\n\nBu sürüm **Android 11 veya üzeri** için imzalı bir APK olarak sunuluyor. Uygulamayı açıp **Kullanım erişimi** iznini ver. Uyarı almak için bildirimleri etkinleştir.\n\nKısa oturumlarda uygulama ve hotspot kırılımı Android’in kayıt sıklığına bağlı olarak gecikebilir.",
+      "coverImage": "/uploads/data-warner.png",
+      "category": "Mobil Uygulama",
+      "techStack": [
+        "Android",
+        "Java",
+        "SQLite"
+      ],
+      "demoUrl": "",
+      "repoUrl": "",
+      "downloadUrl": "https://suleymanibis.dev/downloads/Data-Warner-1.3.apk",
+      "version": "v1.3",
+      "status": "live",
+      "featured": true,
+      "en": {
+        "title": "Data Warner",
+        "tagline": "Track mobile data on Android, measure a session, and set your own usage alert.",
+        "description": "Data Warner is an Android app I built to track mobile data use and total mobile data shared through a hotspot.\n\n## Features\n\n- View mobile data usage in hourly, daily, and weekly charts.\n- See per-app usage and total hotspot usage separately.\n- Use the **Data Meter** to measure data between Start and Stop. Chart intervals adapt to the length of your session.\n- Set the data limit and time window for usage alerts. The default is **3 GB in one hour**.\n\n## Installation\n\nThis release is available as a signed APK for **Android 11 or later**. Open the app and grant **Usage access**. Enable notifications to receive alerts.\n\nPer-app and hotspot figures for short sessions may appear with a delay as Android updates its records.",
+        "category": "Mobile App"
+      },
+      "id": "app-data-warner",
+      "createdAt": "2026-11-20T16:08:58.340Z",
+      "updatedAt": "2026-11-20T16:08:58.340Z"
+    },
+    {
       "title": "FizikLab",
       "slug": "fiziklab",
       "tagline": "Fizik I laboratuvarındaki beş deney için ölçüm, hesaplama ve grafik uygulaması.",
