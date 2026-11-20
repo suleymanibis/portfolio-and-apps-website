@@ -149,7 +149,7 @@
         "SQLite"
       ],
       "demoUrl": "",
-      "repoUrl": "",
+      "repoUrl": "https://github.com/suleymanibis/data-warner",
       "downloadUrl": "https://suleymanibis.dev/downloads/Data-Warner-1.3.apk",
       "version": "v1.3",
       "status": "live",
@@ -162,7 +162,7 @@
       },
       "id": "app-data-warner",
       "createdAt": "2026-11-20T16:08:58.340Z",
-      "updatedAt": "2026-11-20T16:13:34.818Z"
+      "updatedAt": "2026-11-20T16:27:57.852Z"
     },
     {
       "title": "FizikLab",
