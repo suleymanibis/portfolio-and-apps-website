@@ -155,14 +155,14 @@
       "status": "live",
       "featured": true,
       "en": {
-        "title": "Data Warner",
-        "tagline": "Track mobile data on Android, measure a session, and set your own usage alert.",
-        "description": "Data Warner is an Android app I built to track mobile data use and total mobile data shared through a hotspot.\n\n## Features\n\n- View mobile data usage in hourly, daily, and weekly charts.\n- See per-app usage and total hotspot usage separately.\n- Use the **Data Meter** to measure data between Start and Stop. Chart intervals adapt to the length of your session.\n- Set the data limit and time window for usage alerts. The default is **3 GB in one hour**.\n\n## Installation\n\nThis release is available as a signed APK for **Android 11 or later**. Open the app and grant **Usage access**. Enable notifications to receive alerts.\n\nPer-app and hotspot figures for short sessions may appear with a delay as Android updates its records.",
-        "category": "Mobile App"
+        "title": "datawarner",
+        "tagline": "Track your mobile data consumption on Android, start a measurement session and set your own usage limit.",
+        "description": "Data Warner is an Android application I developed to monitor mobile data usage and total data shared via hotspot.\n\n## Features\n\n- Examine mobile data usage in hourly, daily and weekly graphs.\n- See app usage and hotspot total separately.\n- Measure data spent between Start and End with **Data Counter**. Chart intervals vary depending on session duration.\n- Set data limit and duration of usage alert. Default value is **3 GB in 1 hour**.\n\n## Installation\n\nThis version is available as a signed APK for **Android 11 or above**. Open the app and grant **Usage access** permission. Enable notifications to receive alerts.\n\nIn short sessions, application and hotspot downloading may be delayed depending on the recording frequency of Android.",
+        "category": "Mobile Application"
       },
       "id": "app-data-warner",
       "createdAt": "2026-11-20T16:08:58.340Z",
-      "updatedAt": "2026-11-20T16:08:58.340Z"
+      "updatedAt": "2026-11-20T16:13:34.818Z"
     },
     {
       "title": "FizikLab",
