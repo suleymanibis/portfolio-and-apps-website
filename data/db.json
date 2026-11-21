@@ -141,7 +141,7 @@
       "slug": "data-warner",
       "tagline": "Android’de mobil veri tüketimini takip et, ölçüm oturumu başlat ve kendi kullanım sınırını belirle.",
       "description": "Data Warner, Android’de mobil veri kullanımını takip etmek için geliştirdiğim bir uygulama. Hangi uygulamanın ne kadar veri harcadığını, hotspot üzerinden toplam ne kadar veri paylaştığını ve paketinde kaç GB kaldığını tek yerden görebilirsin.\n\n## Özellikler\n\n- **Kullanım grafikleri:** Mobil veri tüketimini saatlik, günlük ve haftalık incele. Grafikte bir aralık seçerek o aralığın toplamını gör.\n- **Uygulama ve hotspot kullanımı:** Uygulamaların tüketimini ve toplam içindeki payını karşılaştır. Hotspot üzerinden paylaşılan veriyi ayrı ekranda izle.\n- **Mobil veri paketi:** Paket boyutunu ve yenilenme gününü gir. Kalan veriyi ve günlük kullanım bütçeni gör. Tüketim %80 ve %95’e ulaştığında uyarı al.\n- **Veri sayacı:** Dizi izlerken veya oyun oynarken ne kadar veri harcadığını ölç. Oturumun toplam tüketimini ve tahmini saatlik tüketimini gör. Ölçümleri adlandır, geçmişten tekrar aç veya sil.\n- **Kullanım uyarısı:** Veri sınırını ve süreyi kendin belirle. Varsayılan sınır **1 saatte 3 GB**. Bildirime dokunarak o aralığın kullanım ayrıntılarını incele.\n- **Widget:** Bugünkü mobil veri tüketimini ve kalan paketini ana ekrandan takip et.\n\n## Şu ana kadar neler değişti?\n\n- **Paket takibi ve widget (v1.4):** Kalan interneti, yenilenme tarihini ve günlük kullanım bütçesini gösteren paket takibi eklendi. Paket %80 ve %95 dolduğunda uyarı geliyor. Ana ekran widget’ı bugünkü tüketimi ve kalan paketi gösteriyor.\n- **Grafikler ve uygulama listeleri (v1.4.1–v1.4.4):** Kullanım toplamı, grafik ve tarih seçimi aynı kartta toplandı. Uygulamaların toplam tüketimdeki payı gösterilmeye başlandı. Arka plan sistem bileşenleri gizlendi. YouTube ve Chrome gibi açılabilir ön yüklü uygulamalar listede gösteriliyor.\n- **Sayaç ve bildirimler (v1.4–v1.4.4):** Ölçümlere isim verme, geçmişten tekrar açma ve tahmini saatlik tüketimi görme eklendi. Veri uyarısına dokununca ilgili aralığın kullanım ayrıntıları açılıyor. Sayaç geçmişi ayrı bir ekrana taşındı. Kayıtlar tek tek veya topluca silinebiliyor, sayaç geçmiş korunarak sıfırlanabiliyor.\n- **Arayüz ve gezinme (v1.4.1–v1.5):** Açık ve koyu temalar sadeleştirildi. Bildirim, görünüm ve paket ayarları ayrı ekranlara taşındı. Sekmeler dokunarak veya kaydırarak değiştirilebiliyor. Komşu sekme kaydırırken parmağı takip ediyor. Sekme verileri önceden hazırlanıyor ve geri, düzenle, sıfırla ve sil gibi işlemler ikonlarla gösteriliyor.\n\n## Kurulum\n\nİmzalı APK’yı indirip **Android 11 veya üzeri** bir cihaza kur. Uygulamayı açınca **Kullanım erişimi** iznini ver. Kullanım uyarılarını almak için bildirimleri etkinleştir.\n\nKısa ölçümlerde uygulama ve hotspot verileri, Android’in kullanım kayıtlarını güncelleme sıklığına bağlı olarak gecikebilir.\n\n[Tüm sürüm notları](https://github.com/suleymanibis/data-warner/releases/tag/v1.5)",
-      "coverImage": "https://github.com/suleymanibis/data-warner.png",
+      "coverImage": "/uploads/data-warner.png",
       "category": "Mobil Uygulama",
       "techStack": [
         "Android",
@@ -162,7 +162,7 @@
       },
       "id": "app-data-warner",
       "createdAt": "2026-11-20T16:08:58.340Z",
-      "updatedAt": "2026-11-21T16:25:35.729Z"
+      "updatedAt": "2026-11-21T16:37:06.360Z"
     },
     {
       "title": "FizikLab",
