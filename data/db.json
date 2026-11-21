@@ -198,7 +198,7 @@
       "slug": "video-indirme-yoneticisi",
       "tagline": "YouTube videolarını, desteklenen TV bölümlerini ve doğrudan video bağlantılarını Windows’a kaydet.",
       "description": "Video İndirme Yöneticisi, video bağlantılarını Windows bilgisayara kaydetmek için geliştirilmiş bir masaüstü uygulamasıdır. Bağlantıyı yapıştır, kayıt klasörünü ve tercih ettiğin çözünürlüğü seç, ardından **Videoyu indir** düğmesine bas.\n\n## Özellikler\n\n- YouTube, doğrudan video adresleri ve NOW TV, Kanal D, TRT 1’in desteklenen bölüm bağlantılarıyla çalışır.\n- İndirme ilerlemesini gösterir ve devam eden indirmeyi iptal etmeye olanak tanır.\n- İndirme motoru yt-dlp ilk kullanımda otomatik kurulur. FFmpeg varsa ayrı ses ve görüntü akışları birleştirilebilir.",
-      "coverImage": "https://raw.githubusercontent.com/suleymanibis/portfolio-and-apps-website/main/public/uploads/4a9e32c9-34d8-4b3b-b31c-3e31a0d649af.jpg",
+      "coverImage": "https://raw.githubusercontent.com/suleymanibis/portfolio-and-apps-website/main/public/uploads/12ed67b8-419f-4dbd-901f-b13649198dbd.png",
       "category": "Masaüstü Uygulaması",
       "techStack": [
         "C#",
@@ -221,7 +221,7 @@
       },
       "id": "app-1795096441777",
       "createdAt": "2026-11-19T13:54:01.777Z",
-      "updatedAt": "2026-11-21T16:26:40.842Z"
+      "updatedAt": "2026-11-21T16:35:43.505Z"
     }
   ],
   "articles": []
